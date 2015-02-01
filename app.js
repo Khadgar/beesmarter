@@ -37,6 +37,9 @@ mongoose.connect('mongodb://beesmarter:beesmarter@ds039261.mongolab.com:39261/be
 //user model in user.js
 var Teams = require(path.join(__dirname, './models/team.js'))(mongoose);
 
+//designer model in designer.js
+var Designers = require(path.join(__dirname, './models/designer.js'))(mongoose);
+
 //settings collection
 var Settings = require(path.join(__dirname, './models/settings.js'))(mongoose);
 
@@ -45,7 +48,7 @@ var Settings = require(path.join(__dirname, './models/settings.js'))(mongoose);
 require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Teams);
 
 //routing in routes.js
-require(path.join(__dirname, './routes/routes.js'))(app, passport, Teams, Settings, io, interval_id,timeout_id);
+require(path.join(__dirname, './routes/routes.js'))(app, passport, Teams,Designers, Settings, io, interval_id,timeout_id);
 
 //create server
 http.listen(app.get('port'), function () {

@@ -4,7 +4,7 @@ var fs = require('fs');
 
 var led;
 
-module.exports = function (app, passport, Teams, Settings,io,interval_id,timeout_id) {
+module.exports = function (app, passport, Teams, Designers, Settings, io, interval_id, timeout_id) {
 
 	var profilecontent = fs.readFileSync(path.join(__dirname, '../views/profile.html'), 'utf-8');
 	var profilecompiled = ejs.compile(profilecontent);
@@ -75,22 +75,63 @@ module.exports = function (app, passport, Teams, Settings,io,interval_id,timeout
 
 	});
 
+	app.post('/signupdesigner', function (req, res) {
+
+		Designers.findOne({
+			'name' : req.body.designername
+		}, function (err, user) {
+			if (user) {
+				res.writeHead(200, {
+					'Content-Type' : 'text/html'
+				});
+				res.end(errorcompiled({
+						errormsg : 'Designer exists!'
+					}));
+			} else {
+
+				if (req.body.designername != '') {
+					var newdesigner = {
+						name : req.body.designername
+					};
+					var designer = new Designers(newdesigner);
+
+					designer.save(function (error, data) {
+						if (error) {
+							res.json(error);
+						} else {
+							res.redirect('/admin');
+						}
+					});
+				} else {
+					res.writeHead(200, {
+						'Content-Type' : 'text/html'
+					});
+					res.end(errorcompiled({
+							errormsg : 'You have to fill username and password fields!'
+						}));
+				}
+
+			}
+		});
+
+	});
+
 	//global socket handling
 	io.on('connection', function (socket) {
-	
+
 		console.log('a user connected');
 
 		socket.on('starta1', function () {
 			console.log('Start Auction 1');
-			
+
 			clearInterval(interval_id);
 			clearTimeout(timeout_id)
-			console.log(interval_id)
-			
+			//console.log(interval_id)
+
 			Settings.findOne({
 				id : '1'
 			}, function (error, set) {
-				console.log(set.votetimeout)
+				//console.log(set.votetimeout)
 				timeout = set.votetimeout;
 
 				interval_id = setInterval(function () {
@@ -101,11 +142,11 @@ module.exports = function (app, passport, Teams, Settings,io,interval_id,timeout
 					}, 1000);
 
 				timeout_id = setTimeout(function () {
-					clearInterval(interval_id);
-					io.emit('timer', {
-						countdown : "Vége"
-					});
-				}, timeout * 1000);
+						clearInterval(interval_id);
+						io.emit('timer', {
+							countdown : "Vége"
+						});
+					}, timeout * 1000);
 
 			});
 		});
@@ -147,6 +188,27 @@ module.exports = function (app, passport, Teams, Settings,io,interval_id,timeout
 					username : user.TeamFullName
 				}));
 		});
+
+		io.on('connection', function (socket) {
+			console.log('a user connected');
+			
+			socket.on('message', function (msg) {
+				//console.log('message: ' + msg);
+				Designers.find({})
+				.select('name')
+				.exec(function (err, users) {
+					//console.log(users);
+					//socket.emit csak a kuldonek valaszol. io.emit valaszol mindenkinek.
+					socket.emit('users', users)
+					delete users;
+				});
+			});
+
+			socket.on('disconnect', function () {
+				console.log('a user disconnected');
+			});
+		});
+
 	});
 
 	app.get('/loginFailure', function (req, res, next) {
@@ -163,7 +225,7 @@ module.exports = function (app, passport, Teams, Settings,io,interval_id,timeout
 			Teams.findOne({
 				TeamID : req.user.TeamID
 			}, function (error, user) {
-				console.log(user.role)
+				//console.log(user.role)
 				//json string double quoted
 				if (user.role == "on") {
 					res.writeHead(200, {
@@ -183,6 +245,16 @@ module.exports = function (app, passport, Teams, Settings,io,interval_id,timeout
 			});
 		});
 
+	});
+	
+	app.post('/bidfordesigner', function (req, res) {
+		console.log(req.body);
+		res.redirect('/personal');
+	});
+	
+	app.post('/bidforsensor', function (req, res) {
+		console.log(req.body);
+		res.redirect('/personal');
 	});
 
 	app.get('/logout', function (req, res) {

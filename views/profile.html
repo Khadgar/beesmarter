@@ -21,8 +21,57 @@
 	socket.on('timer', function (data) {  
 		$('#counter').html(data.countdown);
 	});
+	
+	socket.emit('message', 'hello server kerem szepen a felhasznalokat');
+
+	socket.on('users', function (msg) {
+		document.getElementById('userwrapper').innerHTML =""
+		for(var i=0;i<msg.length;i++){
+			var newspan = document.createElement('span');	
+			newspan.innerHTML='<div class="radio"><label><input type="radio" name="optradio" value="designer_'+i+'">'+msg[i]['name']+'</label></div><br>' 			
+			document.getElementById('userwrapper').appendChild(newspan);
+
+		}
+		
+	});
+	
+	function adduser(username) {
+		document.getElementById('designerfield').value =  username;
+	}
+	
+	
+	
 	</script>
 	
+	<style>
+	.span4{
+		background-color:white;
+	}
+
+	.keret{
+		border:solid 1px black;
+	}
+	
+	.userbtn{
+		white-space:normal !important;
+		max-width:100px;
+		min-width:100px;
+		max-height:100px;
+		min-height:100px;
+	}
+	
+	.text-warning {
+		color: @warningText;
+	}
+	
+	#tartozasform label.error {
+		margin-left: 10px;
+		width: auto;
+		display: inline;
+	}
+	</style>
+
+  </head>
 	
   </head>
 
@@ -53,16 +102,38 @@
     <div class="jumbotron">
       <div class="container">
         <h1>Welcome <%= username %>!</h1>
-        <p>You are registered and now you can vote.</p>
-        <p><a class="btn btn-primary btn-lg" href="/vote" role="button">Go &raquo;</a></p>
       </div>
     </div>
 
     <div class="container">
 		<p>Time left:</p>
 		<p id="counter"></p>
+		<div class="row row-centered">
+		   <div class="col-xs-6 col-centered col-max keret">
+				<h2 class="sub-header">Designers</h2>
+
+				<form class="form-inline" role="form" action="/bidfordesigner" method="post">
+					<div id="userwrapper"> 
+					</div>
+					<input type="text" placeholder="Összeg" class="form-control" name="designerosszeg" id = "designerosszegfield" >
+					<button type="submit" class="btn btn-success">BID</button>
+				</form>
+			</div>
+			
+			<div class="col-xs-6 col-centered col-max keret">
+				<h2 class="sub-header">Sensors</h2>
+				<div id="sensorwrapper"> 
+				</div>
+				<form class="form-inline" role="form" action="/bidforsensor" method="post">
+					<input type="text" placeholder="Összeg" class="form-control" name="sensorosszeg" id = "sensorosszegfield" >
+					<button type="submit" class="btn btn-success">BID</button>
+				</form>
+
+			</div>
 		
-    </div> 
+		</div>
+		
+	</div>
 
   </body>
 </html>

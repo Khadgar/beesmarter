@@ -4,7 +4,7 @@ var fs = require('fs');
 
 var led;
 
-module.exports = function (app, passport, Teams, io) {
+module.exports = function (app, passport, Teams, Settings,io,interval_id,timeout_id) {
 
 	var profilecontent = fs.readFileSync(path.join(__dirname, '../views/profile.html'), 'utf-8');
 	var profilecompiled = ejs.compile(profilecontent);
@@ -75,11 +75,43 @@ module.exports = function (app, passport, Teams, io) {
 
 	});
 
+	//global socket handling
 	io.on('connection', function (socket) {
+	
 		console.log('a user connected');
 
-		socket.on('message', function (msg) {
-			console.log('message: ' + msg);
+		socket.on('starta1', function () {
+			console.log('Start Auction 1');
+			
+			clearInterval(interval_id);
+			clearTimeout(timeout_id)
+			console.log(interval_id)
+			
+			Settings.findOne({
+				id : '1'
+			}, function (error, set) {
+				console.log(set.votetimeout)
+				timeout = set.votetimeout;
+
+				interval_id = setInterval(function () {
+						timeout--;
+						io.emit('timer', {
+							countdown : timeout
+						});
+					}, 1000);
+
+				timeout_id = setTimeout(function () {
+					clearInterval(interval_id);
+					io.emit('timer', {
+						countdown : "Vége"
+					});
+				}, timeout * 1000);
+
+			});
+		});
+
+		socket.on('reset', function () {
+			console.log('Reset Auction 1');
 		});
 
 		socket.on('disconnect', function () {
@@ -157,4 +189,5 @@ module.exports = function (app, passport, Teams, io) {
 		req.logout();
 		res.redirect('/');
 	});
+
 };

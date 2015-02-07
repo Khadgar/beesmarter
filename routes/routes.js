@@ -4,7 +4,7 @@ var fs = require('fs');
 
 var led;
 
-module.exports = function (app, passport, Teams, Designers, Settings, io, interval_id, timeout_id) {
+module.exports = function (app, passport, Teams, Designers,DesignerBID, Settings, io, interval_id, timeout_id, timeout) {
 
 	var profilecontent = fs.readFileSync(path.join(__dirname, '../views/profile.html'), 'utf-8');
 	var profilecompiled = ejs.compile(profilecontent);
@@ -151,15 +151,21 @@ module.exports = function (app, passport, Teams, Designers, Settings, io, interv
 			});
 		});
 
-		socket.on('reset', function () {
-			console.log('Reset Auction 1');
-		});
+
 
 		socket.on('disconnect', function () {
 			console.log('user disconnected');
 		});
 	});
 
+	function GetMax(Collection){
+			Collection.findOne({ field1 : 1 }).sort(last_mod, 1).run( function(err, doc) {
+			var max = doc.last_mod;
+		});
+		return max;
+	}
+	
+	
 	var isAuthenticated = function (req, res, next) {
 		if (req.isAuthenticated())
 			return next();
@@ -203,7 +209,7 @@ module.exports = function (app, passport, Teams, Designers, Settings, io, interv
 					delete users;
 				});
 			});
-
+			
 			socket.on('disconnect', function () {
 				console.log('a user disconnected');
 			});
@@ -248,7 +254,43 @@ module.exports = function (app, passport, Teams, Designers, Settings, io, interv
 	});
 	
 	app.post('/bidfordesigner', function (req, res) {
-		console.log(req.body);
+		
+		
+		io.on('connection', function (socket) {
+			socket.on('BIDcheck', function (msg) {
+			console.log(msg)
+				if(timeout){
+					if(timeout<=1){
+					socket.emit('BIDfail','A BID nem kerult rogzitesre');
+					}else{
+					socket.emit('BIDsuccess','A BID rogzitesre kerult');
+					}
+				}else{
+					socket.emit('BIDfail','A BID nem kerult rogzitesre');
+				}
+			});
+			socket.on('disconnect', function () {
+			});
+		});
+
+		if(timeout){
+			if(timeout<=1){
+					//nincs rogzitve a bid
+				}else{
+					var newdesignerbid = {
+						name : req.body.optradio,
+						osszeg: req.body.designerosszeg,
+						felado: req.user.TeamID
+					};
+					var designerbid = new DesignerBID(newdesignerbid);
+					designerbid.save();
+				}
+			}else{
+				//nincs rogzitve a bid
+			}
+		
+		
+		
 		res.redirect('/personal');
 	});
 	

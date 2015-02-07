@@ -12,7 +12,7 @@ var mongoose = require('mongoose');
 var io = require('socket.io')(http);
 
 //id of the running countdown
-var interval_id,timeout_id;
+var interval_id,timeout_id, timeout;
 
 //configure the app
 app.set('port', process.env.PORT || 3000);
@@ -40,6 +40,12 @@ var Teams = require(path.join(__dirname, './models/team.js'))(mongoose);
 //designer model in designer.js
 var Designers = require(path.join(__dirname, './models/designer.js'))(mongoose);
 
+//designer model in designer.js
+var DesignerBID = require(path.join(__dirname, './models/designerbid.js'))(mongoose);
+
+//designer model in designer.js
+var SensorBID = require(path.join(__dirname, './models/sensorbid.js'))(mongoose);
+
 //settings collection
 var Settings = require(path.join(__dirname, './models/settings.js'))(mongoose);
 
@@ -48,7 +54,7 @@ var Settings = require(path.join(__dirname, './models/settings.js'))(mongoose);
 require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Teams);
 
 //routing in routes.js
-require(path.join(__dirname, './routes/routes.js'))(app, passport, Teams,Designers, Settings, io, interval_id,timeout_id);
+require(path.join(__dirname, './routes/routes.js'))(app, passport, Teams,Designers,DesignerBID, Settings, io, interval_id,timeout_id,timeout);
 
 //create server
 http.listen(app.get('port'), function () {

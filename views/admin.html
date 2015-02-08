@@ -16,10 +16,10 @@
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   </head>
 
-  
-  
-  
-  
+
+
+
+
   <body>
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -35,9 +35,9 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/personal"><%= username %></a></li>	
-			<li class="active"><a href="/admin">Admin</a></li>		
-			<li><a href="/logout">Logout</a></li>				
+            <li><a href="/personal"><%= username %></a></li>
+			<li class="active"><a href="/admin">Admin</a></li>
+			<li><a href="/logout">Logout</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
       </div>
@@ -48,8 +48,8 @@
 
     <div class="container">
 	<div>
-		<form class="form-inline" role="form" action="/signup" method="post">
-          
+		<form class="form-inline" role="form" action="/signupteam" method="post">
+
             <br>
 			<br><br>
 			<br>
@@ -77,9 +77,9 @@
 			<br>
             <button type="submit" class="btn btn-success">Add</button>
 			<br>
-			<br>  
+			<br>
           </form>
-		  
+
 		  <form class="form-inline" role="form" action="/signupdesigner" method="post">
             <br>
 			<br>
@@ -90,28 +90,28 @@
 			<br>
             <button type="submit" class="btn btn-success">Add</button>
 			<br>
-			<br>  
+			<br>
           </form>
-		  
-		  
-		  
-		  
+
+
+
+
 		 <button class="btn btn-primary btn-lg" id="starta1">Start Auction 1</button>
 		 <button class="btn btn-primary btn-lg" id="starta2">Start Auction 2</button>
-		  
-		  
-		  
+
+
+
 	</div>
     </div> <!-- /container -->
 <script>
-	
+
 	var socket=io();
 	$("#starta1").click(function() {
 		socket.emit("starta1");
-		console.log("btn pressed")
+		console.log("btn pressed");
 	});
 
-	
+
 </script>
   </body>
 </html>

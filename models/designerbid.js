@@ -13,4 +13,4 @@ module.exports = function (mongoose) {
 	var model = mongoose.model('DesignerBID', DesignerBID);
 
 	return model;
-}
+};

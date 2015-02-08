@@ -11,9 +11,6 @@ var http = require('http').Server(app);
 var mongoose = require('mongoose');
 var io = require('socket.io')(http);
 
-//id of the running countdown
-var interval_id,timeout_id, timeout;
-
 //configure the app
 app.set('port', process.env.PORT || 3000);
 app.use(express.cookieParser('dandroid'));
@@ -32,7 +29,7 @@ app.use(passport.session());
 //mongoose.connect('mongodb://localhost/MyDatabase');
 
 //host https://mongolab.com
-mongoose.connect('mongodb://beesmarter:beesmarter@ds039261.mongolab.com:39261/beesmarterdb')
+mongoose.connect('mongodb://beesmarter:beesmarter@ds039261.mongolab.com:39261/beesmarterdb');
 
 //user model in user.js
 var Teams = require(path.join(__dirname, './models/team.js'))(mongoose);
@@ -54,7 +51,10 @@ var Settings = require(path.join(__dirname, './models/settings.js'))(mongoose);
 require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Teams);
 
 //routing in routes.js
-require(path.join(__dirname, './routes/routes.js'))(app, passport, Teams,Designers,DesignerBID, Settings, io, interval_id,timeout_id,timeout);
+require(path.join(__dirname, './routes/login.js'))(app, passport);
+require(path.join(__dirname, './routes/signup.js'))(app, Teams, Designers);
+require(path.join(__dirname, './routes/routes.js'))(app, passport, Teams,Designers,DesignerBID, Settings, io);
+
 
 //create server
 http.listen(app.get('port'), function () {

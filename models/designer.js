@@ -11,4 +11,4 @@ module.exports = function (mongoose) {
 	var model = mongoose.model('Designers', Designer);
 
 	return model;
-}
+};

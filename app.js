@@ -50,12 +50,12 @@ require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Teams);
 
 //routing in routes.js
 require(path.join(__dirname, './routes/login.js')).Login(app, passport);
-require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, DesignerBID);
-require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app);
+require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, DesignerBID, Teams, Designers);
+require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app, io, Teams);
 require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, Designers);
 
 require(path.join(__dirname, './routes/admin.js')).globalIO(io);
-require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io);
+require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers);
 
 
 //create server

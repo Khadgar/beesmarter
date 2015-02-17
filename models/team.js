@@ -6,6 +6,8 @@ module.exports = function (mongoose) {
 			TeamID : String,
 			Password : String,
 			TeamFullName : String,
+			money: Number,
+			designer: String,
 			role : String
 		}, {
 			collection : 'Teams'
@@ -14,4 +16,4 @@ module.exports = function (mongoose) {
 	var model = mongoose.model('Teams', Team);
 
 	return model;
-}
+};

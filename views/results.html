@@ -12,15 +12,15 @@
 
     <!-- Bootstrap core CSS -->
     <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-	<script src="https://cdn.socket.io/socket.io-1.3.3.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.3.3.js"></script>
 
-	<script>
-	var socket=io();
-	socket.on('timer', function (data) {
-		$('#counter').html(data.value);
-	});
+    <script>
+    var socket=io();
+    socket.on('timer', function (data) {
+        $('#counter').html(data.value);
+    });
 
     socket.on('designerAuctionStarted', function(data) {
         $('#currentDesignerName').html(data.designer);
@@ -29,19 +29,8 @@
         document.getElementById("submitDesignerBTN").disabled = false;
     });
 
-
-	$(document).ready(function() {
-        var username = document.getElementById("username").innerHTML;
-           $("#submitDesignerBTN").click(function() {
-    		      socket.emit('BIDcheck', {
-                    username: username
-                  });
-           });
-    });
-
     socket.on('BIDfail', function (msg) {
         $('#bidstate').html(msg);
-        console.log('BidFail, return false');
     });
 
     socket.on('BIDsuccess', function (msg) {
@@ -49,39 +38,49 @@
         document.getElementById("submitDesignerBTN").disabled = true;
     });
 
-	</script>
 
-	<style>
-	.span4{
-		background-color:white;
-	}
+    $(document).ready(function() {
+        var username = document.getElementById("username").innerHTML;
+       $("#submitDesignerBTN").click(function() {
+              socket.emit('BIDcheck', {
+                username: username
+              });
+       });
+    });
 
-	.keret{
-		border:solid 1px black;
-	}
+    </script>
 
-	.userbtn{
-		white-space:normal !important;
-		max-width:100px;
-		min-width:100px;
-		max-height:100px;
-		min-height:100px;
-	}
+    <style>
+    .span4{
+        background-color:white;
+    }
 
-	.text-warning {
-		color: @warningText;
-	}
+    .keret{
+        border:solid 1px black;
+    }
 
-	#tartozasform label.error {
-		margin-left: 10px;
-		width: auto;
-		display: inline;
-	}
+    .userbtn{
+        white-space:normal !important;
+        max-width:100px;
+        min-width:100px;
+        max-height:100px;
+        min-height:100px;
+    }
 
-	.hidden {
+    .text-warning {
+        color: @warningText;
+    }
+
+    #tartozasform label.error {
+        margin-left: 10px;
+        width: auto;
+        display: inline;
+    }
+
+    .hidden {
      display:none;
-	}
-	</style>
+    }
+    </style>
 
   </head>
 
@@ -100,36 +99,22 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a id="username" href="/results"><%= username %></a></li>
-            <li class="active"><a href="/designer">Designer</a></li>
+            <li class="active"><a id="username" href="/results"><%= username %></a></li>
+            <li><a href="/designer">Designer</a></li>
             <li><a href="/sensor">Sensor</a></li>
-			<li><a href="/admin">Admin</a></li>
-			<li><a href="/logout">Logout</a></li>
+            <li><a href="/admin">Admin</a></li>
+            <li><a href="/logout">Logout</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
       </div>
     </nav>
-    <br>
-    <br>
-    <br>
-    <p>Priority list:</p>
-    <ul>
-    <% if (piorityList) { %>
-      <% piorityList.forEach(function(designer){ %>
-        <div>Name: <%- designer.name %> Bid: <%= designer.value %></div>
-      <% }); %>
-    <% } %>
-    </ul>
 
-        <p>Current desinger:</p>
-        <div id="currentDesignerName"></div>
-        <div id="currentDesignerValue"></div>
-
-    	<p>Current bid value:</p>
-    	<div id="counter"></div>
-        <p id="bidstate"></p>
-
-    	<button id= "submitDesignerBTN" class="btn btn-success" disabled>BID</button>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Welcome <%= username %>!</h1>
+      </div>
+    </div>
 
   </body>
 </html>

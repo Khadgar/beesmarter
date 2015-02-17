@@ -4,7 +4,7 @@ module.exports = function (mongoose) {
 	var Schema = mongoose.Schema;
 	var DesignerBID = new Schema({
 			name : String,
-			osszeg: String,
+			osszeg: Number,
 			felado: String
 		}, {
 			collection : 'DesignerBID'

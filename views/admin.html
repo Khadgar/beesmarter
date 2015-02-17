@@ -16,11 +16,25 @@
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
   </head>
 
+  <script>
+    var socket=io();
 
+    socket.emit('message', 'hello server kerem szepen a designereket');
+
+    socket.on('designers', function (msg) {
+      document.getElementById('userwrapper').innerHTML ="";
+      for(var i = 0; i < msg.length; i++) {
+          var newspan = document.createElement('span');
+          newspan.innerHTML = '<div class="radio"><label><input type="radio" name="optradio" value="' + msg[i].name + '">' + msg[i].name + '</label></div>';
+          document.getElementById('userwrapper').appendChild(newspan);
+      }
+    });
+  </script>
 
 
 
   <body>
+
 
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
@@ -35,9 +49,11 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/personal"><%= username %></a></li>
-			<li class="active"><a href="/admin">Admin</a></li>
-			<li><a href="/logout">Logout</a></li>
+            <li><a href="/results"><%= username %></a></li>
+            <li><a href="/designer">Designer</a></li>
+            <li><a href="/sensor">Sensor</a></li>
+      			<li class="active"><a href="/admin">Admin</a></li>
+      			<li><a href="/logout">Logout</a></li>
           </ul>
         </div><!--/.navbar-collapse -->
       </div>
@@ -49,6 +65,9 @@
     <div class="container">
 	<div>
     <br>
+    <br>
+    <br>
+      <h3 class="sub-header">Designers</h3>
 		  <form class="form-inline" role="form" action="/startDesignerAuction" method="post">
         <br>
   			<br>
@@ -64,6 +83,7 @@
           <input type="text" placeholder="Step time(seconds)" class="form-control" name="stepTime">
         </div>
         <br>
+        <div id="userwrapper"></div>
 		   <button type="submit" class="btn btn-success">Start Designer Auction</button>
       </form>
 
@@ -73,11 +93,5 @@
 
 	</div>
     </div> <!-- /container -->
-<script>
-	var socket=io();
-	$("#starta1").click(function() {
-		socket.emit("starta1");
-	});
-</script>
   </body>
 </html>

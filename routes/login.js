@@ -22,7 +22,7 @@ var Login = function(app, passport) {
     });
 
     app.get('/loginSuccess', function(req, res, next) {
-        res.redirect('/personal');
+        res.redirect('/results');
     });
 
     app.get('/logout', function(req, res) {

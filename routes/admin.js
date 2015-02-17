@@ -21,7 +21,9 @@ var maxBidValue,
 var interval_id,
     timeout_id;
 
-var Admin = function(app, Teams, io) {
+var designer;
+
+var Admin = function(app, Teams, io, Designers) {
     app.get('/admin', isAuthenticated, function(req, res, next) {
         process.nextTick(function() {
             Teams.findOne({
@@ -39,6 +41,22 @@ var Admin = function(app, Teams, io) {
                 }
             });
         });
+
+        io.on('connection', function(socket) {
+            console.log('a user connected, I\'m in admin.js2');
+
+            socket.on('message', function(msg) {
+                Designers.find({team: undefined})
+                    .select('name')
+                    .exec(function(err, designers) {
+                        socket.emit('designers', designers);
+                    });
+            });
+
+            socket.on('disconnect', function() {
+                console.log('a user disconnected, I\'m in admin.js2');
+            });
+        });
     });
 
     app.post('/startDesignerAuction', function(req,res) {
@@ -46,10 +64,11 @@ var Admin = function(app, Teams, io) {
         currentBidValue = maxBidValue;
         minBidValue = req.body.minValue;
         stepTime = req.body.stepTime;
+        designer = req.body.optradio;
 
         io.on('connection', function(socket) {
             io.emit('designerAuctionStarted', {
-                designer: 'Kamu ember',
+                designer: designer,
                 minBidValue: minBidValue,
                 maxBidValue: maxBidValue
             });
@@ -66,6 +85,7 @@ var Admin = function(app, Teams, io) {
         }, 1000 * stepTime);
 
         timeout_id = setTimeout(function() {
+            currentBidValue -= step;
             clearInterval(interval_id);
             io.emit('timer', {
                 value: "Vége"
@@ -96,6 +116,15 @@ var getMinValue = function() {
 var endAuction = function() {
     clearInterval(interval_id);
     clearTimeout(timeout_id);
+    currentBidValue = undefined;
+    maxBidValue = undefined;
+    minBidValue = undefined;
+    stepTime = undefined;
+    designer = undefined;
+};
+
+var getCurrentDesigner = function(){
+    return designer;
 };
 
 
@@ -104,3 +133,4 @@ exports.globalIO = globalIO;
 exports.getCurrentValue = getCurrentValue;
 exports.getMinValue = getMinValue;
 exports.endAuction = endAuction;
+exports.getCurrentDesigner = getCurrentDesigner;

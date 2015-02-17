@@ -1,11 +1,14 @@
 var path = require('path');
 
-module.exports = function(app, passport) {
+var isAuthenticated = function(req, res, next) {
+    if (req.isAuthenticated())
+        return next();
+    res.redirect('/login');
+};
+
+var Login = function(app, passport) {
     app.get('/login', function(req, res) {
-        console.log("login.html");
-
         res.sendfile(path.join(__dirname, '../views/index.html'));
-
     });
 
     app.post('/login',
@@ -27,3 +30,6 @@ module.exports = function(app, passport) {
         res.redirect('/');
     });
 };
+
+exports.Login = Login;
+exports.isAuthenticated = isAuthenticated;

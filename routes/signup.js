@@ -4,7 +4,7 @@ var writeHead = function(res) {
     });
 };
 
-module.exports = function(app, Designers, Teams) {
+var Signup = function(app, Designers, Teams) {
     app.post('/signupteam', function(req, res) {
 
         var newUserName = req.body.username;
@@ -84,3 +84,5 @@ module.exports = function(app, Designers, Teams) {
 
     });
 };
+
+exports.Signup = Signup;

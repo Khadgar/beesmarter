@@ -93,9 +93,6 @@
 			<br>
           </form>
 
-
-
-
 		 <button class="btn btn-primary btn-lg" id="starta1">Start Auction 1</button>
 		 <button class="btn btn-primary btn-lg" id="starta2">Start Auction 2</button>
 
@@ -104,14 +101,10 @@
 	</div>
     </div> <!-- /container -->
 <script>
-
 	var socket=io();
 	$("#starta1").click(function() {
 		socket.emit("starta1");
-		console.log("btn pressed");
 	});
-
-
 </script>
   </body>
 </html>

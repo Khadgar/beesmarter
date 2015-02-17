@@ -51,13 +51,9 @@
 		}
 	});
 
-	function addBid(){
-		socket.emit('BIDcheck', 'Bidelhetek?');
-	}
-
 	$(document).ready(function() {
        $("#submitDesignerBTN").click(function() {
-		   socket.emit('BIDcheck', 'Bidelhetek?');
+		      socket.emit('BIDcheck');
        });
     });
 
@@ -140,10 +136,8 @@
 		   <div class="col-xs-6 col-centered col-max keret" id="designervote">
 				<h2 class="sub-header">Designers</h2>
 
-				<form class="form-inline" role="form" action="/bidfordesigner" method="post" id="designerbidform">
-					<div id="userwrapper"></div>
-					<button  id= "submitDesignerBTN"  type="submit" onclick="addBid()" class="btn btn-success">BID</button>
-				</form>
+				<div id="userwrapper"></div>
+				<button  id= "submitDesignerBTN" class="btn btn-success">BID</button>
 			</div>
 		</div>
 

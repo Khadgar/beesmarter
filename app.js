@@ -43,8 +43,6 @@ var DesignerBID = require(path.join(__dirname, './models/designerbid.js'))(mongo
 //designer model in designer.js
 var SensorBID = require(path.join(__dirname, './models/sensorbid.js'))(mongoose);
 
-//settings collection
-var Settings = require(path.join(__dirname, './models/settings.js'))(mongoose);
 
 
 //authentication in auth.js
@@ -52,13 +50,12 @@ require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Teams);
 
 //routing in routes.js
 require(path.join(__dirname, './routes/login.js')).Login(app, passport);
-require(path.join(__dirname, './routes/signup.js')).Signup(app, Teams, Designers);
 require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, DesignerBID);
 require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app);
 require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, Designers);
 
-require(path.join(__dirname, './routes/admin.js')).globalIO(Settings, io);
-require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams);
+require(path.join(__dirname, './routes/admin.js')).globalIO(io);
+require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io);
 
 
 //create server

@@ -12,9 +12,16 @@ var admincontent = fs.readFileSync(path.join(__dirname, '../views/admin.html'), 
 var admincompiled = ejs.compile(admincontent);
 
 //id of the running countdown
-var interval_id, timeout_id, timeout;
+var maxBidValue,
+    minBidValue,
+    currentBidValue,
+    stepTime,
+    step = 10;
 
-var Admin = function(app, Teams) {
+var interval_id,
+    timeout_id;
+
+var Admin = function(app, Teams, io) {
     app.get('/admin', isAuthenticated, function(req, res, next) {
         process.nextTick(function() {
             Teams.findOne({
@@ -33,54 +40,67 @@ var Admin = function(app, Teams) {
             });
         });
     });
+
+    app.post('/startDesignerAuction', function(req,res) {
+        maxBidValue = req.body.maxValue;
+        currentBidValue = maxBidValue;
+        minBidValue = req.body.minValue;
+        stepTime = req.body.stepTime;
+
+        io.on('connection', function(socket) {
+            io.emit('designerAuctionStarted', {
+                designer: 'Kamu ember',
+                minBidValue: minBidValue,
+                maxBidValue: maxBidValue
+            });
+        });
+
+        clearInterval(interval_id);
+        clearTimeout(timeout_id);
+
+        interval_id = setInterval(function() {
+            currentBidValue -= step;
+            io.emit('timer', {
+                value: currentBidValue
+            });
+        }, 1000 * stepTime);
+
+        timeout_id = setTimeout(function() {
+            clearInterval(interval_id);
+            io.emit('timer', {
+                value: "Vége"
+            });
+        }, ((maxBidValue - minBidValue)/step) * 1000 * stepTime);
+        res.redirect('/admin');
+    });
 };
 
-var globalIO = function(io, Settings) {
+var globalIO = function(io) {
     io.on('connection', function(socket) {
 
         console.log('a user connected, I\'m in admin.js');
-
-        socket.on('starta1', function() {
-            console.log('Start Auction 1');
-
-            clearInterval(interval_id);
-            clearTimeout(timeout_id);
-            //console.log(interval_id)
-            Settings.findOne({
-                id: '1'
-            }, function(error, set) {
-                var timeout = getTimeout();
-                interval_id = setInterval(function() {
-                    timeout--;
-                    io.emit('timer', {
-                        countdown: timeout
-                    });
-                }, 1000);
-
-                timeout_id = setTimeout(function() {
-                    clearInterval(interval_id);
-                    io.emit('timer', {
-                        countdown: "Vége"
-                    });
-                }, timeout * 1000);
-
-            });
-        });
         socket.on('disconnect', function() {
             console.log('user disconnected , I\'m in admin.js');
         });
     });
 };
 
-var getTimeout = function(){
-    return timeout;
+var getCurrentValue = function(){
+    return currentBidValue;
 };
 
-var setTimeout = function(value) {
-    timeout = value;
+var getMinValue = function() {
+    return minBidValue;
+};
+
+var endAuction = function() {
+    clearInterval(interval_id);
+    clearTimeout(timeout_id);
 };
 
 
-exports.getAdmin = getAdmin;
+exports.Admin = Admin;
 exports.globalIO = globalIO;
-exports.getTimeout = getTimeout;
+exports.getCurrentValue = getCurrentValue;
+exports.getMinValue = getMinValue;
+exports.endAuction = endAuction;

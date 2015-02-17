@@ -48,52 +48,25 @@
 
     <div class="container">
 	<div>
-		<form class="form-inline" role="form" action="/signupteam" method="post">
+    <br>
+		  <form class="form-inline" role="form" action="/startDesignerAuction" method="post">
+        <br>
+  			<br>
+  			<div class="form-group">
+          <input type="text" placeholder="Max Value" class="form-control" name="maxValue">
+        </div>
+  			<br>
+        <div class="form-group">
+          <input type="text" placeholder="Min Value" class="form-control" name="minValue">
+        </div>
+  			<br>
+        <div class="form-group">
+          <input type="text" placeholder="Step time(seconds)" class="form-control" name="stepTime">
+        </div>
+        <br>
+		   <button type="submit" class="btn btn-success">Start Designer Auction</button>
+      </form>
 
-            <br>
-			<br><br>
-			<br>
-			<div class="form-group">
-              <input type="text" placeholder="Team ID" class="form-control" name="username">
-            </div>
-			<br>
-			<br>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control" name="password">
-            </div>
-			<br>
-			<br>
-			<div class="form-group">
-              <input type="text" placeholder="Team Full Name" class="form-control" name="fullname">
-            </div>
-			<br>
-			<br>
-			  <div class="checkbox">
-				<label>
-				  <input type="checkbox" name="role"> Admin
-				</label>
-			  </div>
-			<br>
-			<br>
-            <button type="submit" class="btn btn-success">Add</button>
-			<br>
-			<br>
-          </form>
-
-		  <form class="form-inline" role="form" action="/signupdesigner" method="post">
-            <br>
-			<br>
-			<div class="form-group">
-              <input type="text" placeholder="Designer Name" class="form-control" name="designername">
-            </div>
-			<br>
-			<br>
-            <button type="submit" class="btn btn-success">Add</button>
-			<br>
-			<br>
-          </form>
-
-		 <button class="btn btn-primary btn-lg" id="starta1">Start Auction 1</button>
 		 <button class="btn btn-primary btn-lg" id="starta2">Start Auction 2</button>
 
 

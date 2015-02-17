@@ -2,7 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var ejs = require('ejs');
 
-var profilecontent = fs.readFileSync(path.join(__dirname, '../views/profile.html'), 'utf-8');
+var profilecontent = fs.readFileSync(path.join(__dirname, '../views/designerBid.html'), 'utf-8');
 var profilecompiled = ejs.compile(profilecontent);
 
 var writeHead = require('./utils.js').writeHead;

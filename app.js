@@ -31,17 +31,15 @@ app.use(passport.session());
 //host https://mongolab.com
 mongoose.connect('mongodb://beesmarter:beesmarter@ds039261.mongolab.com:39261/beesmarterdb');
 
-//user model in user.js
 var Teams = require(path.join(__dirname, './models/team.js'))(mongoose);
 
-//designer model in designer.js
 var Designers = require(path.join(__dirname, './models/designer.js'))(mongoose);
 
-//designer model in designer.js
 var DesignerBID = require(path.join(__dirname, './models/designerbid.js'))(mongoose);
 
-//designer model in designer.js
 var SensorBID = require(path.join(__dirname, './models/sensorbid.js'))(mongoose);
+
+var PriorityList = require(path.join(__dirname, './models/prioritylist.js'))(mongoose);
 
 
 
@@ -50,11 +48,9 @@ require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Teams);
 
 //routing in routes.js
 require(path.join(__dirname, './routes/login.js')).Login(app, passport);
-require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, DesignerBID, Teams, Designers);
+require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, DesignerBID, Teams, Designers, PriorityList);
 require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app, io, Teams);
-require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, Designers);
-
-require(path.join(__dirname, './routes/admin.js')).globalIO(io);
+require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, PriorityList);
 require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers);
 
 

@@ -20,19 +20,26 @@
 	var socket=io();
 	socket.on('timer', function (data) {
 		$('#counter').html(data.value);
+        if(data.value === "Vége") {
+            document.getElementById("submitDesignerBTN").disabled = true;
+        }
 	});
 
     socket.on('designerAuctionStarted', function(data) {
+        console.log('Auction started ');
         $('#currentDesignerName').html(data.designer);
         $('#currentDesignerValue').html(data.minBidValue);
         $('#counter').html(data.maxBidValue);
-        document.getElementById("submitDesignerBTN").disabled = false;
+        if(data.designer !== undefined) {
+            document.getElementById("submitDesignerBTN").disabled = false;
+        }
+        socket.removeAllListeners('designerAuctionStarted');
     });
-
 
 	$(document).ready(function() {
         var username = document.getElementById("username").innerHTML;
            $("#submitDesignerBTN").click(function() {
+                console.log('Bidckeck');
     		      socket.emit('BIDcheck', {
                     username: username
                   });
@@ -41,12 +48,13 @@
 
     socket.on('BIDfail', function (msg) {
         $('#bidstate').html(msg);
-        console.log('BidFail, return false');
     });
 
-    socket.on('BIDsuccess', function (msg) {
-        $('#bidstate').html(msg);
+    socket.on('BIDsuccess', function (data) {
+        $('#bidstate').html(data.msg);
         document.getElementById("submitDesignerBTN").disabled = true;
+        socket.removeAllListeners('BIDsuccess');
+        socket.removeAllListeners('BIDfail');
     });
 
 	</script>
@@ -112,15 +120,10 @@
     <br>
     <br>
     <br>
-    <p>Priority list:</p>
-    <ul>
-    <% if (piorityList) { %>
-      <% piorityList.forEach(function(designer){ %>
-        <div>Name: <%- designer.name %> Bid: <%= designer.value %></div>
-      <% }); %>
-    <% } %>
-    </ul>
-
+    <h3>Priority list:</h3>
+    <div id="prioritylist"></div>
+    <br>
+     <h3>Designer bid:</h3>
         <p>Current desinger:</p>
         <div id="currentDesignerName"></div>
         <div id="currentDesignerValue"></div>

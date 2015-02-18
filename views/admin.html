@@ -19,16 +19,6 @@
   <script>
     var socket=io();
 
-    socket.emit('message', 'hello server kerem szepen a designereket');
-
-    socket.on('designers', function (msg) {
-      document.getElementById('userwrapper').innerHTML ="";
-      for(var i = 0; i < msg.length; i++) {
-          var newspan = document.createElement('span');
-          newspan.innerHTML = '<div class="radio"><label><input type="radio" name="optradio" value="' + msg[i].name + '">' + msg[i].name + '</label></div>';
-          document.getElementById('userwrapper').appendChild(newspan);
-      }
-    });
   </script>
 
 
@@ -68,24 +58,35 @@
     <br>
     <br>
       <h3 class="sub-header">Designers</h3>
-		  <form class="form-inline" role="form" action="/startDesignerAuction" method="post">
-        <br>
-  			<br>
-  			<div class="form-group">
-          <input type="text" placeholder="Max Value" class="form-control" name="maxValue">
-        </div>
-  			<br>
-        <div class="form-group">
-          <input type="text" placeholder="Min Value" class="form-control" name="minValue">
-        </div>
-  			<br>
-        <div class="form-group">
-          <input type="text" placeholder="Step time(seconds)" class="form-control" name="stepTime">
-        </div>
-        <br>
-        <div id="userwrapper"></div>
-		   <button type="submit" class="btn btn-success">Start Designer Auction</button>
-      </form>
+    		  <form class="form-inline" role="form" action="/startDesignerAuction" method="post">
+            <br>
+      			<br>
+      			<div class="form-group">
+              <input type="text" placeholder="Max Value" class="form-control" name="maxValue">
+            </div>
+      			<br>
+            <div class="form-group">
+              <input type="text" placeholder="Min Value" class="form-control" name="minValue">
+            </div>
+      			<br>
+            <div class="form-group">
+              <input type="text" placeholder="Step time(seconds)" class="form-control" name="stepTime">
+            </div>
+            <br>
+            <div id="designerWrapper">
+            <% if (designers) { %>
+            <span>
+              <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
+                <div class="radio">
+                  <label><%= designer.name %> <input type="radio" name="optradio" value=<%- quoteName %>></label>
+                </div>
+                <br>
+              <% }); %>
+            </span>
+            <% } %>
+            </div>
+    		   <button type="submit" class="btn btn-success">Start Designer Auction</button>
+          </form>
 
 		 <button class="btn btn-primary btn-lg" id="starta2">Start Auction 2</button>
 

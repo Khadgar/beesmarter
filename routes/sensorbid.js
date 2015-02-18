@@ -16,6 +16,7 @@ var sensorCompiled = ejs.compile(sensorContent);
 var SensorBid = function(app, io, Teams) {
 
     io.on('connection', function(socket) {
+        console.log('CONNECTED , sensorbid');
         socket.on('BIDSensorcheck', function(data) {
             var username = data.username;
 
@@ -46,7 +47,9 @@ var SensorBid = function(app, io, Teams) {
                 }
             });
         });
-        socket.on('disconnect', function() {});
+        socket.on('disconnect', function() {
+            console.log('DISCONNECTED , sensorbid');
+        });
     });
 
     app.get('/sensor', isAuthenticated, function(req, res, next) {
@@ -54,7 +57,7 @@ var SensorBid = function(app, io, Teams) {
             TeamID: req.user.TeamID
         }, function(error, user) {
             writeHead(res);
-            res.end(designerCompiled({
+            res.end(sensorCompiled({
                 username: user.TeamFullName
             }));
         });

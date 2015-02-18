@@ -16,30 +16,31 @@
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.3.3.js"></script>
 
-    <script>
-    var socket=io();
-
-    socket.on('BIDsuccess', function (msg) {
-        //$('#bidstate').html(msg);
-        $('#priorityList').html(msg);
-    });
-
-    function createPriorityList(prioritylist) {
-        document.getElementById('prioritylist').innerHTML ="";
-        for(var i = 0; i < prioritylist.length; i++) {
-            var newul = document.createElement('ul');
-            newul.innerHTML = '<div>Team: '+ prioritylist[i].team +' List: '+ prioritylist[i].list + '</div>';
-            document.getElementById('prioritylist').appendChild(newul);
-        }
-    }
-
-
-
-    </script>
-
     <style>
     .span4{
         background-color:white;
+    }
+
+    .keret{
+        border:solid 1px black;
+    }
+
+    .userbtn{
+        white-space:normal !important;
+        max-width:100px;
+        min-width:100px;
+        max-height:100px;
+        min-height:100px;
+    }
+
+    .text-warning {
+        color: @warningText;
+    }
+
+    #tartozasform label.error {
+        margin-left: 10px;
+        width: auto;
+        display: inline;
     }
 
     .hidden {
@@ -64,8 +65,8 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="active"><a id="username" href="/results"><%= username %></a></li>
-            <li><a href="/designer">Designer</a></li>
+            <li><a id="username" href="/results"><%= username %></a></li>
+            <li class="active"><a href="/designer">Designer</a></li>
             <li><a href="/sensor">Sensor</a></li>
             <li><a href="/admin">Admin</a></li>
             <li><a href="/logout">Logout</a></li>
@@ -73,33 +74,23 @@
         </div><!--/.navbar-collapse -->
       </div>
     </nav>
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-      <div class="container">
-        <h1>Welcome <%= username %>!</h1>
-      </div>
-    </div>
-     <div class="container">
-        <h2>Priority lists:</h2>
-        <div id="priorityList">
-        <% if (priorityLists) { %>
-        <span>
-          <% priorityLists.forEach(function(priorityList){ %>
-            <div class="radio">
-              <label><%= priorityList.team %> <br>
-                <% priorityList.list.forEach(function(list){ %>
-                    <%=list.designer %> : <%=list.value %>
-                <% }); %>
-              </label>
+    <br>
+    <br>
+    <br>
+    <h3>Priority list:</h3>
+    <div id="prioritylist"></div>
+    <% if (designers) { %>
+        <form class="form-inline" role="form" action="/priorityList" method="post">
+          <br>
+          <br>
+          <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
+            <div class="form-group">
+              <label><%= designer.name %> <input type="text" class="form-control" name=<%- quoteName %>></label>
             </div>
             <br>
           <% }); %>
-        </span>
-        <% } %>
-        </div>
-
-     </div>
-
+          <button type="submit" class="btn btn-success">Submit priority list</button>
+        </form>
+    <% } %>
   </body>
 </html>

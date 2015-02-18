@@ -11,6 +11,7 @@ var errorcompiled = ejs.compile(errorcontent);
 var admincontent = fs.readFileSync(path.join(__dirname, '../views/admin.html'), 'utf-8');
 var admincompiled = ejs.compile(admincontent);
 
+
 //id of the running countdown
 var maxBidValue,
     minBidValue,
@@ -31,30 +32,20 @@ var Admin = function(app, Teams, io, Designers) {
             }, function(error, user) {
                 writeHead(res);
                 if (user.role === 'on') {
-                    res.end(admincompiled({
-                        username: user.TeamFullName
-                    }));
+                    Designers.find({})
+                        .select('name')
+                        .exec(function(err, designers) {
+                            res.end(admincompiled({
+                            username: user.TeamFullName,
+                            designers: designers
+                        }));
+                    });
+
                 } else {
                     res.end(errorcompiled({
                         errormsg: 'You have to log in as admin to see this page!'
                     }));
                 }
-            });
-        });
-
-        io.on('connection', function(socket) {
-            console.log('a user connected, I\'m in admin.js2');
-
-            socket.on('message', function(msg) {
-                Designers.find({team: undefined})
-                    .select('name')
-                    .exec(function(err, designers) {
-                        socket.emit('designers', designers);
-                    });
-            });
-
-            socket.on('disconnect', function() {
-                console.log('a user disconnected, I\'m in admin.js2');
             });
         });
     });
@@ -67,10 +58,15 @@ var Admin = function(app, Teams, io, Designers) {
         designer = req.body.optradio;
 
         io.on('connection', function(socket) {
+            console.log('user disconnected , I\'m in admin.js, designerAuctionStarted');
             io.emit('designerAuctionStarted', {
                 designer: designer,
                 minBidValue: minBidValue,
-                maxBidValue: maxBidValue
+                maxBidValue: currentBidValue
+            });
+
+            socket.once('disconnect', function() {
+                console.log('user disconnected , I\'m in admin.js');
             });
         });
 
@@ -86,7 +82,7 @@ var Admin = function(app, Teams, io, Designers) {
 
         timeout_id = setTimeout(function() {
             currentBidValue -= step;
-            clearInterval(interval_id);
+            endAuction();
             io.emit('timer', {
                 value: "Vége"
             });
@@ -95,15 +91,6 @@ var Admin = function(app, Teams, io, Designers) {
     });
 };
 
-var globalIO = function(io) {
-    io.on('connection', function(socket) {
-
-        console.log('a user connected, I\'m in admin.js');
-        socket.on('disconnect', function() {
-            console.log('user disconnected , I\'m in admin.js');
-        });
-    });
-};
 
 var getCurrentValue = function(){
     return currentBidValue;
@@ -129,7 +116,6 @@ var getCurrentDesigner = function(){
 
 
 exports.Admin = Admin;
-exports.globalIO = globalIO;
 exports.getCurrentValue = getCurrentValue;
 exports.getMinValue = getMinValue;
 exports.endAuction = endAuction;

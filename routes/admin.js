@@ -22,9 +22,9 @@ var maxBidValue,
 var interval_id,
     timeout_id;
 
-var designer;
+var bidSubject;
 
-var Admin = function(app, Teams, io, Designers) {
+var Admin = function(app, Teams, io, Designers, Sensors) {
     app.get('/admin', isAuthenticated, function(req, res, next) {
         process.nextTick(function() {
             Teams.findOne({
@@ -35,10 +35,13 @@ var Admin = function(app, Teams, io, Designers) {
                     Designers.find({})
                         .select('name')
                         .exec(function(err, designers) {
-                            res.end(admincompiled({
-                            username: user.TeamFullName,
-                            designers: designers
-                        }));
+                            Sensors.find().exec(function(err, sensors) {
+                                res.end(admincompiled({
+                                    username: user.TeamFullName,
+                                    designers: designers,
+                                    sensors: sensors
+                                }));
+                            });
                     });
 
                 } else {
@@ -50,17 +53,57 @@ var Admin = function(app, Teams, io, Designers) {
         });
     });
 
-    app.post('/startDesignerAuction', function(req,res) {
+    app.post('/startDesignerAuction', isAuthenticated, function(req,res) {
         maxBidValue = req.body.maxValue;
         currentBidValue = maxBidValue;
         minBidValue = req.body.minValue;
         stepTime = req.body.stepTime;
-        designer = req.body.optradio;
+        bidSubject = req.body.optradio;
 
         io.on('connection', function(socket) {
             console.log('user disconnected , I\'m in admin.js, designerAuctionStarted');
             io.emit('designerAuctionStarted', {
-                designer: designer,
+                designer: bidSubject,
+                minBidValue: minBidValue,
+                maxBidValue: currentBidValue
+            });
+
+            socket.once('disconnect', function() {
+                console.log('user disconnected , I\'m in admin.js');
+            });
+        });
+
+        clearInterval(interval_id);
+        clearTimeout(timeout_id);
+
+        interval_id = setInterval(function() {
+            currentBidValue -= step;
+            io.emit('timer', {
+                value: currentBidValue
+            });
+        }, 1000 * stepTime);
+
+        timeout_id = setTimeout(function() {
+            currentBidValue -= step;
+            endAuction();
+            io.emit('timer', {
+                value: "Vége"
+            });
+        }, ((maxBidValue - minBidValue)/step) * 1000 * stepTime);
+        res.redirect('/admin');
+    });
+
+    app.post('/startSensorAuction', isAuthenticated, function(req,res) {
+        maxBidValue = req.body.maxValue;
+        currentBidValue = maxBidValue;
+        minBidValue = req.body.minValue;
+        stepTime = req.body.stepTime;
+        bidSubject = req.body.optradio;
+
+        io.on('connection', function(socket) {
+            console.log('user disconnected , I\'m in admin.js, sensorAuctionStarted');
+            io.emit('sensorAuctionStarted', {
+                sensor: bidSubject,
                 minBidValue: minBidValue,
                 maxBidValue: currentBidValue
             });
@@ -107,11 +150,11 @@ var endAuction = function() {
     maxBidValue = undefined;
     minBidValue = undefined;
     stepTime = undefined;
-    designer = undefined;
+    bidSubject = undefined;
 };
 
-var getCurrentDesigner = function(){
-    return designer;
+var getBidSubject = function(){
+    return bidSubject;
 };
 
 
@@ -119,4 +162,4 @@ exports.Admin = Admin;
 exports.getCurrentValue = getCurrentValue;
 exports.getMinValue = getMinValue;
 exports.endAuction = endAuction;
-exports.getCurrentDesigner = getCurrentDesigner;
+exports.getBidSubject = getBidSubject;

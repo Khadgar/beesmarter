@@ -80,16 +80,18 @@
         <h1>Welcome <%= username %>!</h1>
       </div>
     </div>
+
+    <!-- Result of  priorityLists-->
      <div class="container">
         <h2>Priority lists:</h2>
         <div id="priorityList">
         <% if (priorityLists) { %>
         <span>
           <% priorityLists.forEach(function(priorityList){ %>
-            <div class="radio">
+            <div>
               <label><%= priorityList.team %> <br>
                 <% priorityList.list.forEach(function(list){ %>
-                    <%=list.designer %> : <%=list.value %>
+                    <%=list.designer %>: <%=list.value %>,
                 <% }); %>
               </label>
             </div>
@@ -98,7 +100,25 @@
         </span>
         <% } %>
         </div>
+     </div>
 
+     <!-- Result of  designerbids-->
+     <div class="container">
+        <h2>Designer bids:</h2>
+        <div id="designerbids">
+        <% if (designerbids) { %>
+        <span>
+          <% designerbids.forEach(function(designerbid){ %>
+            <div class="radio">
+              <label><%= designerbid.name %>
+                    <%= designerbid.name %>: <%= designerbid.osszeg %> , <%= designerbid.felado %>
+              </label>
+            </div>
+            <br>
+          <% }); %>
+        </span>
+        <% } %>
+        </div>
      </div>
 
   </body>

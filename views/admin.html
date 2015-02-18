@@ -88,7 +88,36 @@
     		   <button type="submit" class="btn btn-success">Start Designer Auction</button>
           </form>
 
-		 <button class="btn btn-primary btn-lg" id="starta2">Start Auction 2</button>
+		 <h3 class="sub-header">Sensors</h3>
+          <form class="form-inline" role="form" action="/startSensorAuction" method="post">
+            <br>
+            <br>
+            <div class="form-group">
+              <input type="text" placeholder="Max Value" class="form-control" name="maxValue">
+            </div>
+            <br>
+            <div class="form-group">
+              <input type="text" placeholder="Min Value" class="form-control" name="minValue">
+            </div>
+            <br>
+            <div class="form-group">
+              <input type="text" placeholder="Step time(seconds)" class="form-control" name="stepTime">
+            </div>
+            <br>
+            <div id="sensorWrapper">
+            <% if (sensors) { %>
+            <span>
+              <% sensors.forEach(function(sensor){ var quoteName='"'+sensor.name+'"';%>
+                <div class="radio">
+                  <label><%= sensor.name %> <input type="radio" name="optradio" value=<%- quoteName %>></label>
+                </div>
+                <br>
+              <% }); %>
+            </span>
+            <% } %>
+            </div>
+           <button type="submit" class="btn btn-success">Start Sensor Auction</button>
+          </form>
 
 
 

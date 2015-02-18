@@ -9,7 +9,7 @@ var isAuthenticated = require('./login.js').isAuthenticated;
 
 var getCurrentValue = require('./admin.js').getCurrentValue;
 var getMinValue = require('./admin.js').getMinValue;
-var getCurrentDesigner = require('./admin.js').getCurrentDesigner;
+var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
 
 
@@ -36,7 +36,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
             }, function(error, team) {
                 var value = getCurrentValue();
                 var minValue = getMinValue();
-                var designer = getCurrentDesigner();
+                var designer = getBidSubject();
                 var money = team.money;
 
                 var check = checkBid(value, minValue, money);
@@ -55,7 +55,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
                     team.save();
 
                     io.emit('BIDsuccess', {
-                        msg:'A BIDet ' + username +' nyerte ' + value + '-ért',
+                        msg:'A BIDet ' + username +' nyerte ' + value + '-ért'
                     });
                 } else {
                     console.log('BidFail');
@@ -104,7 +104,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
         });
     });
 
-    app.post('/priorityList', function(req, res){
+    app.post('/priorityList', isAuthenticated, function(req, res){
         Teams.findOne({
             TeamID: req.user.TeamID
         }, function(error, team) {
@@ -126,17 +126,6 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
             res.redirect('/designer');
         });
     });
-};
-
-
-var getDesigners = function(Designers){
-    var designerFound;
-    Designers.find({team: undefined})
-                .select('name')
-                .exec(function(err, designers) {
-                    designerFound = designers;
-                });
-    return designerFound;
 };
 
 

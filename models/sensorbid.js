@@ -3,7 +3,9 @@ var mongoose = require('mongoose');
 module.exports = function (mongoose) {
 	var Schema = mongoose.Schema;
 	var SensorBID = new Schema({
-			name : String
+			name : String,
+            osszeg: Number,
+            felado: String
 		}, {
 			collection : 'SensorBID'
 		});

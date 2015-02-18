@@ -20,24 +20,30 @@
     var socket=io();
     socket.on('timer', function (data) {
         $('#counter').html(data.value);
+        if(data.value === "Vége") {
+            document.getElementById("submitSensorBTN").disabled = true;
+        }
     });
 
-    socket.on('designerAuctionStarted', function(data) {
-        $('#currentDesignerName').html(data.designer);
-        $('#currentDesignerValue').html(data.minBidValue);
+    socket.on('sensorAuctionStarted', function(data) {
+        $('#currentSensorName').html(data.sensor);
+        $('#currentSensorValue').html(data.minBidValue);
         $('#counter').html(data.maxBidValue);
-        document.getElementById("submitSensorBTN").disabled = false;
+        if(data.sensor !== undefined) {
+            document.getElementById("submitSensorBTN").disabled = false;
+        }
+        socket.removeAllListeners('sensorAuctionStarted');
     });
 
     socket.on('BIDSensorfail', function (msg) {
         $('#bidstate').html(msg);
-        returnValue = false;
     });
 
-    socket.on('BIDSensorsuccess', function (msg) {
-        $('#bidstate').html(msg);
+    socket.on('BIDSensorsuccess', function (data) {
+        $('#bidstate').html(data.msg);
         document.getElementById("submitSensorBTN").disabled = true;
-        returnValue = true;
+        socket.removeAllListeners('BIDSensorsuccess');
+        socket.removeAllListeners('BIDSensorfail');
     });
 
 
@@ -110,9 +116,11 @@
       </div>
     </nav>
     <br>
-        <p>Current desinger:</p>
-        <div id="currentDesignerName"></div>
-        <div id="currentDesignerValue"></div>
+    <br>
+    <h3>Sensor bid:</h3>
+        <p>Current sensor:</p>
+        <div id="currentSensorName"></div>
+        <div id="currentSensorValue"></div>
 
         <p>Current bid value:</p>
         <div id="counter"></div>

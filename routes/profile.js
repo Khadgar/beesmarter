@@ -12,10 +12,7 @@ var isAuthenticated = require('./login.js').isAuthenticated;
 var Profile = function(app, io, Teams, PriorityList, DesignerBID) {
 
     app.get('/', isAuthenticated, function(req, res, next) {
-        writeHead(res);
-        res.end(profilecompiled({
-            username: req.user.TeamFullName
-        }));
+		res.redirect('/results');
     });
 
     app.get('/results', isAuthenticated, function(req, res, next) {

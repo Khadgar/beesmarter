@@ -12,12 +12,22 @@
     "mongoose": "^3.8.17",
     "passport": "^0.2.1",
     "passport-local": "^1.0.0",
-	"socket.io":"1.3.3"
+    "socket.io": "1.3.3",
+    "connect-busboy": "0.0.2",
+    "ftp":"0.3.8"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Julia Joosz and Daniel Szaniszlo",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Khadgar/beesmarter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Khadgar/beesmarter/issues"
+  },
+  "homepage": "https://github.com/Khadgar/beesmarter"
 }

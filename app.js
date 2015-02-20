@@ -11,6 +11,9 @@ var http = require('http').Server(app);
 var mongoose = require('mongoose');
 var io = require('socket.io')(http);
 
+var ftpupload = require('ftp');
+var busboy = require('connect-busboy');
+
 //configure the app
 app.set('port', process.env.PORT || 3000);
 app.use(express.cookieParser('dandroid'));
@@ -22,6 +25,7 @@ app.use(bodyParser.urlencoded({
 	}));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(busboy());
 
 //alapertelmezetten a connect 5 kapcsolatot nyit. poolSize-zal lehet szabalyozni
 //mongo.Db.connect('mongodb://localhost:27017/testDB', {server: {poolSize: 1}});
@@ -54,6 +58,7 @@ require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, De
 require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app, io, Teams, SensorBID);
 require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, PriorityList, DesignerBID);
 require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers, Sensors);
+require(path.join(__dirname, './routes/upload.js')).Upload(app,Teams, ftpupload, busboy);
 
 
 //create server

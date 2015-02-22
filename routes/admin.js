@@ -32,8 +32,7 @@ var Admin = function(app, Teams, io, Designers, Sensors) {
             }, function(error, user) {
                 writeHead(res);
                 if (user.role === 'on') {
-                    Designers.find({})
-                        .select('name')
+                    Designers.find()
                         .exec(function(err, designers) {
                             Sensors.find().exec(function(err, sensors) {
                                 res.end(admincompiled({

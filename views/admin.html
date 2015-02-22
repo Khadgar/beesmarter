@@ -19,6 +19,11 @@
   <script>
     var socket=io();
 
+    socket.on('BIDsuccess', function (data) {
+        $('#bidstate').html(data.msg);
+        socket.removeAllListeners('BIDsuccess');
+    });
+
   </script>
 
 
@@ -88,6 +93,7 @@
             </div>
     		   <button type="submit" class="btn btn-success">Start Designer Auction</button>
           </form>
+          <p id="bidstate"></p>
 
 		 <h3 class="sub-header">Sensors</h3>
           <form class="form-inline" role="form" action="/startSensorAuction" method="post">

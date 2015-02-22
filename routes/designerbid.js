@@ -23,7 +23,7 @@ var designerBidCompiled = ejs.compile(designerBidContent);
 var designerWonContent = fs.readFileSync(path.join(__dirname, '../views/designerWon.html'), 'utf-8');
 var designerWonCompiled = ejs.compile(designerWonContent);
 
-var currentPriorityList;
+var teamCount = 3;
 
 var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList) {
     io.on('connection', function(socket) {
@@ -122,7 +122,20 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
             };
 
             var priorityList = new PriorityList(newPriorityList);
-            priorityList.save();
+            priorityList.save(function(err) {
+                PriorityList.find().exec(function(err, priorityLists) {
+                    if(priorityLists.length === teamCount) {
+
+                        Designers.find().select({ '_id': 0, 'name': 1}).exec(function(err, designers){
+                            var designersWithBids = getMaxDesignerBids(priorityLists, designers);
+                            addMaxDesignerBids(Designers, designersWithBids);
+                        });
+                    }
+
+                });
+            });
+
+
             res.redirect('/designer');
         });
     });
@@ -139,6 +152,37 @@ var checkBid = function(value, minValue, money) {
     } else {
         return false;
     }
+};
+
+var getMaxDesignerBids = function(priorityLists, designers) {
+    var designersWithBids = designers.map(function(designer) {
+        return {
+            name: designer.name,
+            maxBid: 0
+        };
+    });
+
+    priorityLists.forEach(function(priorityList) {
+        priorityList.list.forEach(function(listElement) {
+            designersWithBids.forEach(function(designerWithBids) {
+                if(listElement.designer === designerWithBids.name) {
+                    if(listElement.value > designerWithBids.maxBid) {
+                        designerWithBids.maxBid = listElement.value;
+                        console.log(listElement.value + ' is bigger, than '+designerWithBids.maxBid);
+                    }
+                }
+            });
+
+        });
+    });
+
+    return designersWithBids;
+};
+
+var addMaxDesignerBids = function(Designers, designersWithBids) {
+    designersWithBids.forEach(function(designerWithBid) {
+        Designers.update({name: designerWithBid.name}, {maxBid: designerWithBid.maxBid}, {multi: false}, function (err) {});
+    });
 };
 
 exports.DesignerBid = DesignerBid;

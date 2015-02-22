@@ -6,7 +6,7 @@ module.exports = function (mongoose) {
             team : String,
             list: [{
                 designer: String,
-                value: String
+                value: Number
             }]
         }, {
             collection : 'PriorityList'

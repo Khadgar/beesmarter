@@ -9,7 +9,7 @@ var profilecompiled = ejs.compile(profilecontent);
 var writeHead = require('./utils.js').writeHead;
 var isAuthenticated = require('./login.js').isAuthenticated;
 
-var Profile = function(app, io, Teams, PriorityList, DesignerBID) {
+var Profile = function(app, io, Teams, PriorityList, DesignerBID, Designers) {
 
     app.get('/', isAuthenticated, function(req, res, next) {
 		res.redirect('/results');
@@ -20,35 +20,23 @@ var Profile = function(app, io, Teams, PriorityList, DesignerBID) {
             TeamID: req.user.TeamID
         }, function(error, user) {
             writeHead(res);
+
             PriorityList.find().select({ '_id': 0, 'team': 1, 'list': 1}).exec(
                 function(err, priorityLists){
-                    var currentPriorityList = priorityLists.map(
-                        function(priorityList) {
-                            var newList = priorityList.list;
-                            newList = priorityList.list.map(
-                                function(bid) {
-                                    return {
-                                        designer: bid.designer,
-                                        value:bid.value
-                                    };
-                                }
-                            );
-                            return {
-                                team: priorityList.team,
-                                list: newList
-                            };
-                        }
-                    );
+                    var currentPriorityList = sortPriorityList(priorityLists);
 
                     DesignerBID.find().exec(function(err, designerBids) {
-                         res.end(profilecompiled({
-                                username: user.TeamFullName,
-                                priorityLists: currentPriorityList,
-                                designerbids: designerBids
-                            })
-                        );
-                    });
 
+                        Designers.find().exec(function(err, designers) {
+                            res.end(profilecompiled({
+                                    username: user.TeamFullName,
+                                    priorityLists: currentPriorityList,
+                                    designerbids: designerBids,
+                                    designerResult: designers
+                                })
+                            );
+                        });
+                    });
                 }
             );
         });

@@ -47,7 +47,8 @@ var SensorBID = require(path.join(__dirname, './models/sensorbid.js'))(mongoose)
 
 var PriorityList = require(path.join(__dirname, './models/prioritylist.js'))(mongoose);
 
-
+//assets
+require(path.join(__dirname, './routes/assets.js')).Assest(app);
 
 //authentication in auth.js
 require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Teams);

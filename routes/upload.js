@@ -24,7 +24,7 @@ var Upload = function(app, Teams, ftpupload, busboy) {
     app.post('/uploadFile',  isAuthenticated, function(req, res, next) {
 
         var fstream;
-        console.log(req.user.TeamID)
+        console.log(req.user.TeamID);
         req.pipe(req.busboy);
         req.busboy.on('file', function(fieldname, file, filename) {
             console.log("Uploading: " + filename);

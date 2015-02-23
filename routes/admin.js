@@ -11,6 +11,8 @@ var errorcompiled = ejs.compile(errorcontent);
 var admincontent = fs.readFileSync(path.join(__dirname, '../views/admin.html'), 'utf-8');
 var admincompiled = ejs.compile(admincontent);
 
+var canUpload = true;
+
 
 //id of the running countdown
 var maxBidValue,
@@ -131,6 +133,18 @@ var Admin = function(app, Teams, io, Designers, Sensors) {
         }, ((maxBidValue - minBidValue)/step) * 1000 * stepTime);
         res.redirect('/admin');
     });
+
+	app.post('/startUpload', isAuthenticated, function(req,res,next) {
+		canUpload = true;
+		exports.canUpload = canUpload;
+        res.redirect('/admin');
+    });	
+	
+	app.post('/stopUpload', isAuthenticated, function(req,res,next) {
+		canUpload = false;
+		exports.canUpload = canUpload;
+        res.redirect('/admin');
+    });
 };
 
 
@@ -162,3 +176,5 @@ exports.getCurrentValue = getCurrentValue;
 exports.getMinValue = getMinValue;
 exports.endAuction = endAuction;
 exports.getBidSubject = getBidSubject;
+exports.canUpload = canUpload;
+

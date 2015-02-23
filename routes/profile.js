@@ -73,4 +73,5 @@ var compareBids = function(bid1, bid2) {
     return 0;
 };
 
+exports.sortPriorityList = sortPriorityList;
 exports.Profile = Profile;

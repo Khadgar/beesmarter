@@ -13,6 +13,8 @@ var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
 
 
+var sortPriorityList = require('./profile.js').sortPriorityList;
+
 
 var designerPriorityContent = fs.readFileSync(path.join(__dirname, '../views/designerPriority.html'), 'utf-8');
 var designerPriorityCompiled = ejs.compile(designerPriorityContent);
@@ -123,18 +125,21 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
 
             var priorityList = new PriorityList(newPriorityList);
             priorityList.save(function(err) {
+
                 PriorityList.find().exec(function(err, priorityLists) {
+                    updatePriorityLists(PriorityList, priorityLists);
+
                     if(priorityLists.length === teamCount) {
 
                         Designers.find().select({ '_id': 0, 'name': 1}).exec(function(err, designers){
                             var designersWithBids = getMaxDesignerBids(priorityLists, designers);
                             addMaxDesignerBids(Designers, designersWithBids);
                         });
+                        io.emit('priorityListRoundFinished');
                     }
 
                 });
             });
-
 
             res.redirect('/designer');
         });
@@ -168,7 +173,6 @@ var getMaxDesignerBids = function(priorityLists, designers) {
                 if(listElement.designer === designerWithBids.name) {
                     if(listElement.value > designerWithBids.maxBid) {
                         designerWithBids.maxBid = listElement.value;
-                        console.log(listElement.value + ' is bigger, than '+designerWithBids.maxBid);
                     }
                 }
             });
@@ -182,6 +186,13 @@ var getMaxDesignerBids = function(priorityLists, designers) {
 var addMaxDesignerBids = function(Designers, designersWithBids) {
     designersWithBids.forEach(function(designerWithBid) {
         Designers.update({name: designerWithBid.name}, {maxBid: designerWithBid.maxBid}, {multi: false}, function (err) {});
+    });
+};
+
+var updatePriorityLists = function(PriorityList, priorityLists) {
+    var sortedPriorityLists = sortPriorityList(priorityLists);
+    sortedPriorityLists.forEach(function(priorityList) {
+        PriorityList.update({team: priorityList.team}, {list: priorityList.list}, {multi: false}, function (err) {});
     });
 };
 

@@ -86,52 +86,55 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         bidSubject = req.body.designer;
         priorityListLeader = req.body.bidLeader;
 
+        if (!maxBidValue || !minBidValue || !stepTime || !bidSubject || !priorityListLeader) {
+            res.redirect('/admin');
+        } else {
+            io.on('connection', function(socket) {
+                console.log('user disconnected , I\'m in admin.js, designerAuctionStarted');
+                io.emit('designerAuctionStarted', {
+                    designer: bidSubject,
+                    minBidValue: minBidValue,
+                    maxBidValue: currentBidValue,
+                    priorityListLeader: priorityListLeader
+                });
 
-        io.on('connection', function(socket) {
-            console.log('user disconnected , I\'m in admin.js, designerAuctionStarted');
-            io.emit('designerAuctionStarted', {
-                designer: bidSubject,
-                minBidValue: minBidValue,
-                maxBidValue: currentBidValue,
-                priorityListLeader: priorityListLeader
-            });
-
-            socket.once('disconnect', function() {
-                console.log('user disconnected , I\'m in admin.js');
-            });
-        });
-
-        clearInterval(interval_id);
-        clearTimeout(timeout_id);
-
-        interval_id = setInterval(function() {
-            currentBidValue -= step;
-            io.emit('timer', {
-                value: currentBidValue
-            });
-        }, 1000 * stepTime);
-
-        timeout_id = setTimeout(function() {
-            currentBidValue -= step;
-            io.emit('timer', {
-                value: "Vége"
-            });
-
-            Teams.findOne({
-                TeamFullName: priorityListLeader
-            }, function(error, team) {
-                var teamFullName = priorityListLeader;
-                var value = minBidValue;
-                handleDesignerBidSuccess(DesignerBID, PriorityList, bidSubject, minBidValue, priorityListLeader, team);
-                io.emit('BIDsuccess', {
-                    msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
+                socket.once('disconnect', function() {
+                    console.log('user disconnected , I\'m in admin.js');
                 });
             });
 
+            clearInterval(interval_id);
+            clearTimeout(timeout_id);
+
+            interval_id = setInterval(function() {
+                currentBidValue -= step;
+                io.emit('timer', {
+                    value: currentBidValue
+                });
+            }, 1000 * stepTime);
+
+            timeout_id = setTimeout(function() {
+                currentBidValue -= step;
+                io.emit('timer', {
+                    value: "Vége"
+                });
+
+                Teams.findOne({
+                    TeamFullName: priorityListLeader
+                }, function(error, team) {
+                    var teamFullName = priorityListLeader;
+                    var value = minBidValue;
+                    handleDesignerBidSuccess(DesignerBID, PriorityList, bidSubject, minBidValue, priorityListLeader, team);
+                    io.emit('BIDsuccess', {
+                        msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
+                    });
+                });
 
 
-        }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
-        res.redirect('/admin');
+
+            }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
+            res.redirect('/admin');
+        }
     });
 
     app.post('/startSensorAuction', isAuthenticated, function(req, res) {
@@ -141,37 +144,42 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         stepTime = req.body.stepTime;
         bidSubject = req.body.optradio;
 
-        io.on('connection', function(socket) {
-            console.log('user disconnected , I\'m in admin.js, sensorAuctionStarted');
-            io.emit('sensorAuctionStarted', {
-                sensor: bidSubject,
-                minBidValue: minBidValue,
-                maxBidValue: currentBidValue
+        if (!maxBidValue || !minBidValue || !stepTime || !bidSubject) {
+            res.redirect('/admin');
+        } else {
+
+            io.on('connection', function(socket) {
+                console.log('user disconnected , I\'m in admin.js, sensorAuctionStarted');
+                io.emit('sensorAuctionStarted', {
+                    sensor: bidSubject,
+                    minBidValue: minBidValue,
+                    maxBidValue: currentBidValue
+                });
+
+                socket.once('disconnect', function() {
+                    console.log('user disconnected , I\'m in admin.js');
+                });
             });
 
-            socket.once('disconnect', function() {
-                console.log('user disconnected , I\'m in admin.js');
-            });
-        });
+            clearInterval(interval_id);
+            clearTimeout(timeout_id);
 
-        clearInterval(interval_id);
-        clearTimeout(timeout_id);
+            interval_id = setInterval(function() {
+                currentBidValue -= step;
+                io.emit('timer', {
+                    value: currentBidValue
+                });
+            }, 1000 * stepTime);
 
-        interval_id = setInterval(function() {
-            currentBidValue -= step;
-            io.emit('timer', {
-                value: currentBidValue
-            });
-        }, 1000 * stepTime);
-
-        timeout_id = setTimeout(function() {
-            currentBidValue -= step;
-            endAuction();
-            io.emit('timer', {
-                value: "Vége"
-            });
-        }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
-        res.redirect('/admin');
+            timeout_id = setTimeout(function() {
+                currentBidValue -= step;
+                endAuction();
+                io.emit('timer', {
+                    value: "Vége"
+                });
+            }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
+            res.redirect('/admin');
+        }
     });
 
     app.post('/startUpload', isAuthenticated, function(req, res, next) {

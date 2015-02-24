@@ -6,33 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-
-
     <title>BeeSmarter - Index</title>
-
     <!-- Bootstrap core CSS -->
     <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
-    <script src="https://cdn.socket.io/socket.io-1.3.3.js"></script>
-	<link rel="stylesheet" type="text/css" href="/css/beesmarter.css">
-
-
+    <script src="http://cdn.socket.io/socket.io-1.3.3.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/beesmarter.css">
   </head>
-
   <body class= "allbgcolor">
-
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="/"><img style="max-width:100px; margin-top: -40px"
-           src="/images/beesmarter.png"></a>
+          src="/images/beesmarter.png"></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
@@ -43,42 +36,42 @@
             <li><a href="/upload">Upload</a></li>
             <li><a href="/logout">Logout</a></li>
           </ul>
-        </div><!--/.navbar-collapse -->
-      </div>
-    </nav>
-    <br>
-    <br>
-    <br>
-    <h3>Priority list:</h3>
-    <div id="prioritylist"></div>
-    <% if (designers) { %>
-        <form class="form-inline" role="form" action="/priorityList" method="post">
-          <br>
-          <br>
-          <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
-            <div class="form-group">
-              <label><%= designer.name %> <input type="text" class="form-control" name=<%- quoteName %>></label>
-            </div>
-            <br>
-          <% }); %>
-          <button type="submit" class="btn btn-success">Submit priority list</button>
-        </form>
-    <% } %>
-	
-	<footer class="footer">
-      <center>
-      <img src="images/sap_logo.png" width="50">
-      <img src="images/logo_epam.png" width="50">
-      <img src="images/logo_ericsson.png" width="50">
-      <img src="images/logo_misys.png" width="50">
-      <img src="images/logo_netlife.png" width="50">
-      <img src="images/logo_vrtech_black.png" width="50">
-      <img src="images/logo_pcworld_black.png" width="50">
-      <img src="images/ITK_logo.svg" height="50" alt="PPKE-ITK">
-      <img src="images/logo_mome.png" width="50" alt="MOME">
-      <img src="images/logo_mave.png" width="50" alt="MAVE">
-      <img src="images/logo_eestec.png" width="50" alt="EESTEC LC Budapest">
-      </center>
-    </footer>
-  </body>
-</html>
+          </div><!--/.navbar-collapse -->
+        </div>
+      </nav>
+      <br>
+      <br>
+      <br>
+      <h3>Priority list:</h3>
+      <div id="prioritylist"></div>
+      <% if (designers) { %>
+      <form class="form-inline" role="form" action="/priorityList" method="post">
+        <br>
+        <br>
+        <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
+        <div class="form-group">
+          <label><%= designer.name %> <input type="text" class="form-control" name=<%- quoteName %>></label>
+        </div>
+        <br>
+        <% }); %>
+        <button type="submit" class="btn btn-success">Submit priority list</button>
+      </form>
+      <% } %>
+
+      <footer class="footer">
+        <center>
+        <img src="images/sap_logo.png" width="50">
+        <img src="images/logo_epam.png" width="50">
+        <img src="images/logo_ericsson.png" width="50">
+        <img src="images/logo_misys.png" width="50">
+        <img src="images/logo_netlife.png" width="50">
+        <img src="images/logo_vrtech_black.png" width="50">
+        <img src="images/logo_pcworld_black.png" width="50">
+        <img src="images/ITK_logo.svg" height="50" alt="PPKE-ITK">
+        <img src="images/logo_mome.png" width="50" alt="MOME">
+        <img src="images/logo_mave.png" width="50" alt="MAVE">
+        <img src="images/logo_eestec.png" width="50" alt="EESTEC LC Budapest">
+        </center>
+      </footer>
+    </body>
+  </html>

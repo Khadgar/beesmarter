@@ -40,3 +40,7 @@
 .hidden {
  display:none;
 }
+
+.table-hover tbody tr:hover td {
+    background: rgba(247, 209, 49, 0.63);
+}

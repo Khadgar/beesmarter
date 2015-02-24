@@ -5,6 +5,9 @@ var ejs = require('ejs');
 var writeHead = require('./utils.js').writeHead;
 var isAuthenticated = require('./login.js').isAuthenticated;
 
+var sortPriorityList = require('./profile.js').sortPriorityList;
+var compareBids = require('./profile.js').compareBids;
+
 var errorcontent = fs.readFileSync(path.join(__dirname, '../views/error.html'), 'utf-8');
 var errorcompiled = ejs.compile(errorcontent);
 
@@ -12,6 +15,8 @@ var admincontent = fs.readFileSync(path.join(__dirname, '../views/admin.html'), 
 var admincompiled = ejs.compile(admincontent);
 
 var canUpload = true;
+
+var teamCount = 3;
 
 
 //id of the running countdown
@@ -24,9 +29,11 @@ var maxBidValue,
 var interval_id,
     timeout_id;
 
-var bidSubject;
+var bidSubject,
+    priorityListLeader;
 
-var Admin = function(app, Teams, io, Designers, Sensors) {
+
+var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerBID) {
     app.get('/admin', isAuthenticated, function(req, res, next) {
         process.nextTick(function() {
             Teams.findOne({
@@ -34,14 +41,31 @@ var Admin = function(app, Teams, io, Designers, Sensors) {
             }, function(error, user) {
                 writeHead(res);
                 if (user.role === 'on') {
-                    Designers.find()
-                        .exec(function(err, designers) {
-                            Sensors.find().exec(function(err, sensors) {
-                                res.end(admincompiled({
-                                    username: user.TeamFullName,
-                                    designers: designers,
-                                    sensors: sensors
-                                }));
+                    Sensors.find().exec(function(err, sensors) {
+                        PriorityList.find()
+                            .exec(function(err, priorityLists) {
+                                if (priorityLists.length !== 0) {
+
+                                    var sortedPriorityLists = sortPriorityList(priorityLists);
+                                    var currentBid = sortedPriorityLists[0].list.sort(compareBids)[0];
+                                    var currentBidLeader = sortedPriorityLists[0].team;
+
+                                    res.end(admincompiled({
+                                        username: user.TeamFullName,
+                                        designer: currentBid.designer,
+                                        minValue: currentBid.value,
+                                        maxValue: currentBid.value * 2,
+                                        team: currentBidLeader,
+                                        sensors: sensors
+                                    }));
+                                } else {
+                                    res.end(admincompiled({
+                                        username: user.TeamFullName,
+                                        designer: false,
+                                        sensors: sensors
+                                    }));
+                                }
+
                             });
                     });
 
@@ -54,19 +78,22 @@ var Admin = function(app, Teams, io, Designers, Sensors) {
         });
     });
 
-    app.post('/startDesignerAuction', isAuthenticated, function(req,res) {
+    app.post('/startDesignerAuction', isAuthenticated, function(req, res) {
         maxBidValue = req.body.maxValue;
         currentBidValue = maxBidValue;
         minBidValue = req.body.minValue;
         stepTime = req.body.stepTime;
-        bidSubject = req.body.optradio;
+        bidSubject = req.body.designer;
+        priorityListLeader = req.body.bidLeader;
+
 
         io.on('connection', function(socket) {
             console.log('user disconnected , I\'m in admin.js, designerAuctionStarted');
             io.emit('designerAuctionStarted', {
                 designer: bidSubject,
                 minBidValue: minBidValue,
-                maxBidValue: currentBidValue
+                maxBidValue: currentBidValue,
+                priorityListLeader: priorityListLeader
             });
 
             socket.once('disconnect', function() {
@@ -86,15 +113,28 @@ var Admin = function(app, Teams, io, Designers, Sensors) {
 
         timeout_id = setTimeout(function() {
             currentBidValue -= step;
-            endAuction();
             io.emit('timer', {
                 value: "Vége"
             });
-        }, ((maxBidValue - minBidValue)/step) * 1000 * stepTime);
+
+            Teams.findOne({
+                TeamFullName: priorityListLeader
+            }, function(error, team) {
+                var teamFullName = priorityListLeader;
+                var value = minBidValue;
+                handleDesignerBidSuccess(DesignerBID, PriorityList, bidSubject, minBidValue, priorityListLeader, team);
+                io.emit('BIDsuccess', {
+                    msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
+                });
+            });
+
+
+
+        }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
         res.redirect('/admin');
     });
 
-    app.post('/startSensorAuction', isAuthenticated, function(req,res) {
+    app.post('/startSensorAuction', isAuthenticated, function(req, res) {
         maxBidValue = req.body.maxValue;
         currentBidValue = maxBidValue;
         minBidValue = req.body.minValue;
@@ -130,25 +170,25 @@ var Admin = function(app, Teams, io, Designers, Sensors) {
             io.emit('timer', {
                 value: "Vége"
             });
-        }, ((maxBidValue - minBidValue)/step) * 1000 * stepTime);
+        }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
         res.redirect('/admin');
     });
 
-	app.post('/startUpload', isAuthenticated, function(req,res,next) {
-		canUpload = true;
-		exports.canUpload = canUpload;
+    app.post('/startUpload', isAuthenticated, function(req, res, next) {
+        canUpload = true;
+        exports.canUpload = canUpload;
         res.redirect('/admin');
-    });	
-	
-	app.post('/stopUpload', isAuthenticated, function(req,res,next) {
-		canUpload = false;
-		exports.canUpload = canUpload;
+    });
+
+    app.post('/stopUpload', isAuthenticated, function(req, res, next) {
+        canUpload = false;
+        exports.canUpload = canUpload;
         res.redirect('/admin');
     });
 };
 
 
-var getCurrentValue = function(){
+var getCurrentValue = function() {
     return currentBidValue;
 };
 
@@ -164,17 +204,65 @@ var endAuction = function() {
     minBidValue = undefined;
     stepTime = undefined;
     bidSubject = undefined;
+    priorityListLeader = undefined;
 };
 
-var getBidSubject = function(){
+var getBidSubject = function() {
     return bidSubject;
 };
 
+var handleDesignerBidSuccess = function(DesignerBID, PriorityList, designer, value, teamFullName, team) {
+    endAuction();
+    var newdesignerbid = {
+        name: designer,
+        osszeg: value,
+        felado: teamFullName
+    };
+    var designerbid = new DesignerBID(newdesignerbid);
+    designerbid.save();
+
+    team.designer = designer;
+    team.money -= value;
+    team.save();
+
+    updatePriorityLists(PriorityList, teamFullName, designer);
+};
+
+var updatePriorityLists = function(PriorityList, TeamFullName, designer) {
+    var updatedPriorityLists = [];
+
+    PriorityList.findOneAndRemove({
+        team: TeamFullName
+    }, function(err) {
+        if (err) {
+            console.log(err);
+        }
+        PriorityList.update({}, {
+            $pull: {
+                list: {
+                    designer: "Designer Srác 1"
+                }
+            }
+        }, {
+            multi: true
+        }, function(err, numberAffected) {
+            if (err) {
+                console.log(err);
+            }
+        });
+    });
+};
+
+
 
 exports.Admin = Admin;
+
 exports.getCurrentValue = getCurrentValue;
 exports.getMinValue = getMinValue;
 exports.endAuction = endAuction;
 exports.getBidSubject = getBidSubject;
-exports.canUpload = canUpload;
 
+exports.canUpload = canUpload;
+exports.teamCount = teamCount;
+
+exports.handleDesignerBidSuccess = handleDesignerBidSuccess;

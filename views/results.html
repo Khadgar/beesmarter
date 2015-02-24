@@ -91,15 +91,15 @@
         </div>
      </div>
 
-     <!-- Result of  designerbids-->
+     <!-- Result of  sensorbids-->
      <div class="container">
-        <h2>Designer results:</h2>
-        <div id="designerResult">
-        <% if (designerResult) { %>
+        <h2>Sensor bids:</h2>
+        <div id="sensorbids">
+        <% if (sensorbids) { %>
         <span>
-          <% designerResult.forEach(function(designer){ %>
+          <% sensorbids.forEach(function(sensorbid){ %>
             <label>
-                  <%= designer.name %>: <%= designer.maxBid %>
+                  <%= sensorbid.name %>: <%= sensorbid.osszeg %> , <%= sensorbid.felado %>
             </label>
             <br>
           <% }); %>
@@ -107,7 +107,74 @@
         <% } %>
         </div>
      </div>
-     
+
+     <!-- Result of  designers-->
+     <div class="container">
+        <h2>Designer results:</h2>
+        <div id="designerResult">
+        <% if (designerResult) { %>
+        <span>
+            <table style="width:100%">
+              <tr>
+                <th>Designer</th>
+                <th>Max priority list bid</th>
+                <th>Vote result</th>
+                <th>Sum</th>
+              </tr>
+              <% designerResult.forEach(function(designer){ var sum = designer.maxBid + designer.voteResult;%>
+              <tr>
+                <td><%= designer.name %></td>
+                <td><%= designer.maxBid %></td>
+                <td><%= designer.voteResult%></td>
+                <td><%= sum %></td>
+              </tr>
+          <% }); %>
+          </table>
+        </span>
+        <% } %>
+        </div>
+     </div>
+
+
+     <!-- Result of  teams-->
+     <div class="container">
+        <h2>Team results:</h2>
+        <div id="teamResult">
+        <% if (teamResult) { %>
+        <span>
+            <table style="width:100%">
+              <tr>
+                <th>Team</th>
+                <th>Money</th>
+                <th>Designer</th>
+                <th>Vote result</th>
+                <th>Sum</th>
+              </tr>
+              <% teamResult.forEach(function(team){ var sum = team.money + team.voteResult;%>
+              <tr>
+                <td><%= team.TeamFullName %></td>
+                <td><%= team.money %></td>
+                <% if (team.designer) { %>
+                <td><%= team.designer %></td>
+                <% } else {%>
+                <td></td>
+                <% }%>
+                <td><%= team.voteResult%></td>
+                <td><%= sum %></td>
+              </tr>
+          <% }); %>
+          </table>
+        </span>
+        <% } %>
+        </div>
+     </div>
+     <br/>
+     <br/>
+     <br/>
+     <br/>
+     <br/>
+     <br/>
+
   <footer class="footer">
     <center>
       <img src="images/sap_logo.png" width="50">

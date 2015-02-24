@@ -9,10 +9,10 @@ var profilecompiled = ejs.compile(profilecontent);
 var writeHead = require('./utils.js').writeHead;
 var isAuthenticated = require('./login.js').isAuthenticated;
 
-var Profile = function(app, io, Teams, PriorityList, DesignerBID, Designers) {
+var Profile = function(app, io, Teams, PriorityList, DesignerBID, Designers, SensorBID) {
 
     app.get('/', isAuthenticated, function(req, res, next) {
-		res.redirect('/results');
+        res.redirect('/results');
     });
 
     app.get('/results', isAuthenticated, function(req, res, next) {
@@ -21,21 +21,35 @@ var Profile = function(app, io, Teams, PriorityList, DesignerBID, Designers) {
         }, function(error, user) {
             writeHead(res);
 
-            PriorityList.find().select({ '_id': 0, 'team': 1, 'list': 1}).exec(
-                function(err, priorityLists){
+            PriorityList.find().select({
+                '_id': 0,
+                'team': 1,
+                'list': 1
+            }).exec(
+                function(err, priorityLists) {
                     var currentPriorityList = sortPriorityList(priorityLists);
 
                     DesignerBID.find().exec(function(err, designerBids) {
+                        SensorBID.find().exec(function(err, sensorBids) {
+                            Designers.find().exec(function(err, designers) {
+                                Teams.find().exec(function(err, teams) {
+                                    var competitorTeams = teams.filter(function(team) {
+                                        return !team.role;
+                                    });
+                                    res.end(profilecompiled({
+                                        username: user.TeamFullName,
+                                        priorityLists: currentPriorityList,
+                                        designerbids: designerBids,
+                                        sensorbids: sensorBids,
+                                        designerResult: designers,
+                                        teamResult: competitorTeams
+                                    }));
+                                });
 
-                        Designers.find().exec(function(err, designers) {
-                            res.end(profilecompiled({
-                                    username: user.TeamFullName,
-                                    priorityLists: currentPriorityList,
-                                    designerbids: designerBids,
-                                    designerResult: designers
-                                })
-                            );
+                            });
                         });
+
+
                     });
                 }
             );
@@ -49,6 +63,8 @@ var sortPriorityList = function(priorityList) {
 };
 
 var comparePriorityList = function(priorityList1, priorityList2) {
+    console.log(priorityList1.list);
+    console.log(priorityList2.list);
     var priorityList1Max = priorityList1.list.sort(compareBids)[0].value;
     var priorityList2Max = priorityList2.list.sort(compareBids)[0].value;
 
@@ -74,4 +90,5 @@ var compareBids = function(bid1, bid2) {
 };
 
 exports.sortPriorityList = sortPriorityList;
+exports.compareBids = compareBids;
 exports.Profile = Profile;

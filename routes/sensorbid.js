@@ -28,7 +28,7 @@ var SensorBid = function(app, io, Teams, SensorBID) {
                 var money = team.money;
 
                 var check = checkBid(value, minValue, money);
-                if(check) {
+                if (check) {
                     endAuction();
                     var newsensorbid = {
                         name: getBidSubject(),
@@ -42,7 +42,7 @@ var SensorBid = function(app, io, Teams, SensorBID) {
                     team.save();
 
                     io.emit('BIDSensorsuccess', {
-                        msg:'A BIDet ' + username +' nyerte ' + value + '-ért'
+                        msg: 'A BIDet ' + username + ' nyerte ' + value + '-ért'
                     });
                 } else {
                     socket.emit('BIDSensorfail', 'A BID nem kerult rogzitesre');

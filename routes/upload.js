@@ -13,26 +13,26 @@ var writeHead = require('./utils.js').writeHead;
 var Upload = function(app, Teams, ftpupload, busboy) {
 
     app.get('/upload', isAuthenticated, function(req, res, next) {
-		var canUpload = require('./admin.js').canUpload;
-		if(canUpload){
-			Teams.findOne({
-				TeamID: req.user.TeamID
-			}, function(error, user) {
-				writeHead(res);
-				res.end(uploadcompiled({
-					username: user.TeamFullName
-				}));
-			});
-		}else{	
-			writeHead(res);
-			res.end(errorcompiled({
-				errormsg: 'Time is up!'
-			}));
-		}
+        var canUpload = require('./admin.js').canUpload;
+        if (canUpload) {
+            Teams.findOne({
+                TeamID: req.user.TeamID
+            }, function(error, user) {
+                writeHead(res);
+                res.end(uploadcompiled({
+                    username: user.TeamFullName
+                }));
+            });
+        } else {
+            writeHead(res);
+            res.end(errorcompiled({
+                errormsg: 'Time is up!'
+            }));
+        }
     });
 
-    app.post('/uploadFile',  isAuthenticated, function(req, res, next) {
-	
+    app.post('/uploadFile', isAuthenticated, function(req, res, next) {
+
         var fstream;
         console.log(req.user.TeamID);
         req.pipe(req.busboy);

@@ -11,6 +11,8 @@ var getCurrentValue = require('./admin.js').getCurrentValue;
 var getMinValue = require('./admin.js').getMinValue;
 var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
+var teamCount = require('./admin.js').teamCount;
+var handleDesignerBidSuccess = require('./admin.js').handleDesignerBidSuccess;
 
 
 var sortPriorityList = require('./profile.js').sortPriorityList;
@@ -22,48 +24,22 @@ var designerPriorityCompiled = ejs.compile(designerPriorityContent);
 var designerBidContent = fs.readFileSync(path.join(__dirname, '../views/designerBid.html'), 'utf-8');
 var designerBidCompiled = ejs.compile(designerBidContent);
 
+var designerBidAdminContent = fs.readFileSync(path.join(__dirname, '../views/designerBidAdmin.html'), 'utf-8');
+var designerBidAdminCompiled = ejs.compile(designerBidAdminContent);
+
 var designerWonContent = fs.readFileSync(path.join(__dirname, '../views/designerWon.html'), 'utf-8');
 var designerWonCompiled = ejs.compile(designerWonContent);
 
-var teamCount = 3;
+
 
 var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList) {
     io.on('connection', function(socket) {
         console.log('CONNECTED , designerbid.js');
+
         socket.on('BIDcheck', function(data) {
-            var username = data.username;
+            var teamFullName = data.username;
+            handleDesignerBid(Teams, DesignerBID, PriorityList, teamFullName, io);
 
-            Teams.findOne({
-                TeamFullName: username
-            }, function(error, team) {
-                var value = getCurrentValue();
-                var minValue = getMinValue();
-                var designer = getBidSubject();
-                var money = team.money;
-
-                var check = checkBid(value, minValue, money);
-                if(check) {
-                    endAuction();
-                    var newdesignerbid = {
-                        name: designer,
-                        osszeg: value,
-                        felado: username
-                    };
-                    var designerbid = new DesignerBID(newdesignerbid);
-                    designerbid.save();
-
-                    team.designer = designer;
-                    team.money -= value;
-                    team.save();
-
-                    io.emit('BIDsuccess', {
-                        msg:'A BIDet ' + username +' nyerte ' + value + '-ért'
-                    });
-                } else {
-                    console.log('BidFail');
-                    socket.emit('BIDfail', 'A BID nem kerult rogzitesre');
-                }
-            });
         });
         socket.on('disconnect', function() {
             console.log('DISCONNECTED , designerbid');
@@ -76,27 +52,32 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
             TeamID: req.user.TeamID
         }, function(error, team) {
             writeHead(res);
-            if(team.designer) {
-                    res.end(designerWonCompiled({
+            if (team.designer) {
+                res.end(designerWonCompiled({
                     username: team.TeamFullName
                 }));
-            }
-            else{
+            } else {
                 PriorityList.find({
                     team: team.TeamFullName
-                }, function(err, list){
+                }, function(err, list) {
+                    //Ha admin jogom van
+                    if (team.role === 'on') {
+                        res.end(designerBidAdminCompiled({
+                            username: team.TeamFullName
+                        }));
+                    }
+
                     //Ha nincs prioritas listam
-                    if(!list.length) {
+                    if (!list.length) {
                         Designers.find()
                             .select('name')
                             .exec(function(err, designers) {
-                                    res.end(designerPriorityCompiled({
-                                        username: team.TeamFullName,
-                                        designers: designers
-                                    }));
+                                res.end(designerPriorityCompiled({
+                                    username: team.TeamFullName,
+                                    designers: designers
+                                }));
                             });
-                    }
-                    else {
+                    } else {
                         res.end(designerBidCompiled({
                             username: team.TeamFullName
                         }));
@@ -106,12 +87,12 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
         });
     });
 
-    app.post('/priorityList', isAuthenticated, function(req, res){
+    app.post('/priorityList', isAuthenticated, function(req, res) {
         Teams.findOne({
             TeamID: req.user.TeamID
         }, function(error, team) {
             var newList = [];
-            for(var key in req.body){
+            for (var key in req.body) {
                 newList.push({
                     designer: key,
                     value: req.body[key]
@@ -127,11 +108,13 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
             priorityList.save(function(err) {
 
                 PriorityList.find().exec(function(err, priorityLists) {
-                    updatePriorityLists(PriorityList, priorityLists);
 
-                    if(priorityLists.length === teamCount) {
+                    if (priorityLists.length === teamCount) {
 
-                        Designers.find().select({ '_id': 0, 'name': 1}).exec(function(err, designers){
+                        Designers.find().select({
+                            '_id': 0,
+                            'name': 1
+                        }).exec(function(err, designers) {
                             var designersWithBids = getMaxDesignerBids(priorityLists, designers);
                             addMaxDesignerBids(Designers, designersWithBids);
                         });
@@ -145,6 +128,29 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
         });
     });
 };
+
+var handleDesignerBid = function(Teams, DesignerBID, PriorityList, teamFullName, io) {
+    Teams.findOne({
+        TeamFullName: teamFullName
+    }, function(error, team) {
+        var value = getCurrentValue();
+        var minValue = getMinValue();
+        var designer = getBidSubject();
+        var money = team.money;
+
+        var check = checkBid(value, minValue, money);
+        if (check) {
+            handleDesignerBidSuccess(DesignerBID, PriorityList, designer, value, teamFullName, team);
+            io.emit('BIDsuccess', {
+                msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
+            });
+        } else {
+            console.log('BidFail');
+            socket.emit('BIDfail', 'A BID nem kerult rogzitesre');
+        }
+    });
+};
+
 
 
 var checkBid = function(value, minValue, money) {
@@ -170,8 +176,8 @@ var getMaxDesignerBids = function(priorityLists, designers) {
     priorityLists.forEach(function(priorityList) {
         priorityList.list.forEach(function(listElement) {
             designersWithBids.forEach(function(designerWithBids) {
-                if(listElement.designer === designerWithBids.name) {
-                    if(listElement.value > designerWithBids.maxBid) {
+                if (listElement.designer === designerWithBids.name) {
+                    if (listElement.value > designerWithBids.maxBid) {
                         designerWithBids.maxBid = listElement.value;
                     }
                 }
@@ -185,15 +191,15 @@ var getMaxDesignerBids = function(priorityLists, designers) {
 
 var addMaxDesignerBids = function(Designers, designersWithBids) {
     designersWithBids.forEach(function(designerWithBid) {
-        Designers.update({name: designerWithBid.name}, {maxBid: designerWithBid.maxBid}, {multi: false}, function (err) {});
+        Designers.update({
+            name: designerWithBid.name
+        }, {
+            maxBid: designerWithBid.maxBid
+        }, {
+            multi: false
+        }, function(err) {});
     });
 };
 
-var updatePriorityLists = function(PriorityList, priorityLists) {
-    var sortedPriorityLists = sortPriorityList(priorityLists);
-    sortedPriorityLists.forEach(function(priorityList) {
-        PriorityList.update({team: priorityList.team}, {list: priorityList.list}, {multi: false}, function (err) {});
-    });
-};
 
 exports.DesignerBid = DesignerBid;

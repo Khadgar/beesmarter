@@ -20,9 +20,21 @@
   <script>
     var socket=io();
 
+    socket.on('priorityListRoundFinished', function () {
+        $('#priorityListRoundFinished').html("All the priority lists have been added, you can start the Designer auctions after refresh!");
+        $('#priorityListStatus').html("");
+        document.getElementById("startDesignerAuctionBTN").disabled = false;
+        socket.removeAllListeners('priorityListRoundFinished');
+    });
+
     socket.on('BIDsuccess', function (data) {
-        $('#bidstate').html(data.msg);
+        $('#bidDesignerState').html(data.msg);
         socket.removeAllListeners('BIDsuccess');
+    });
+
+    socket.on('BIDSensorsuccess', function (data) {
+        $('#bidSensorState').html(data.msg);
+        socket.removeAllListeners('BIDSensorsuccess');
     });
 
   </script>
@@ -63,50 +75,58 @@
     <br>
     <br>
       <h3 class="sub-header">Designers</h3>
+      <p id = "priorityListRoundFinished"></p>
+      <% if (designer) { %>
+      <% var designerQuoteName='"'+designer+'"';%>
+      <% var teamQuoteName='"'+team+'"';%>
     		  <form class="form-inline" role="form" action="/startDesignerAuction" method="post">
             <br>
       			<br>
-      			<div class="form-group">
-              <input type="text" placeholder="Max Value" class="form-control" name="maxValue">
+      			<div class="form-group"> Max Value:
+              <input type="text" placeholder="Max Value" readonly class="form-control" name="maxValue" value=<%- maxValue %>>
             </div>
       			<br>
-            <div class="form-group">
-              <input type="text" placeholder="Min Value" class="form-control" name="minValue">
+            <div class="form-group"> Min Value:
+              <input type="text" placeholder="Min Value" readonly class="form-control" name="minValue" value=<%- minValue %>>
+            </div>
+            <br>
+             <div class="form-group"> Priority list bid leader:
+              <input type="text" placeholder="Team" readonly class="form-control" name="bidLeader" value=<%- teamQuoteName %>>
             </div>
       			<br>
-            <div class="form-group">
+            <div class="form-group"> Steptime(in seconds):
               <input type="text" placeholder="Step time(seconds)" class="form-control" name="stepTime">
             </div>
             <br>
-            <div id="designerWrapper">
-            <% if (designers) { %>
+
             <span>
-              <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
-                <div class="radio">
-                  <label><%= designer.name %> <input type="radio" name="optradio" value=<%- quoteName %>></label>
+                <div class="form-group"> Designer:
+                   <input type="text" placeholder="Designer" readonly class="form-control" name="designer"  value=<%- designerQuoteName %>>
                 </div>
                 <br>
-              <% }); %>
             </span>
-            <% } %>
+            <button id= "startDesignerAuctionBTN" type="submit" class="btn btn-success">Start Designer Auction</button>
+            <% } else {%>
+            <div id="priorityListStatus"> The priority lists are empty</div>
+             <% } %>
             </div>
-    		   <button type="submit" class="btn btn-success">Start Designer Auction</button>
+
           </form>
-          <p id="bidstate"></p>
+          <p id="bidDesignerState"></p>
 
 		 <h3 class="sub-header">Sensors</h3>
           <form class="form-inline" role="form" action="/startSensorAuction" method="post">
             <br>
             <br>
-            <div class="form-group">
+            <div class="form-group"> Max Value:
               <input type="text" placeholder="Max Value" class="form-control" name="maxValue">
             </div>
             <br>
-            <div class="form-group">
+            <div class="form-group"> Min Value:
               <input type="text" placeholder="Min Value" class="form-control" name="minValue">
             </div>
             <br>
-            <div class="form-group">
+            <div class="form-group"> Step time(seconds):
               <input type="text" placeholder="Step time(seconds)" class="form-control" name="stepTime">
             </div>
             <br>
@@ -124,24 +144,25 @@
             </div>
            <button type="submit" class="btn btn-success">Start Sensor Auction</button>
           </form>
+          <p id="bidSensorState"></p>
 	       </div>
-		 
+
 		 <h3 class="sub-header">START Upload</h3>
           <form class="form-inline" role="form" action="/startUpload" method="post">
            <button type="submit" class="btn btn-success">START Upload</button>
-          </form> 
+          </form>
 		  <h3 class="sub-header">STOP Upload</h3>
           <form class="form-inline" role="form" action="/stopUpload" method="post">
            <button type="submit" class="btn btn-danger">STOP Upload</button>
           </form>
 
-		   
+
     </div>
             <br>
             <br><br>
             <br>
-			
-			
+
+
 
   <footer class="footer">
     <center>

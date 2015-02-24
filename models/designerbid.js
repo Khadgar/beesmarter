@@ -1,14 +1,14 @@
 var mongoose = require('mongoose');
 
-module.exports = function (mongoose) {
+module.exports = function(mongoose) {
 	var Schema = mongoose.Schema;
 	var DesignerBID = new Schema({
-			name : String,
-			osszeg: Number,
-			felado: String
-		}, {
-			collection : 'DesignerBID'
-		});
+		name: String,
+		osszeg: Number,
+		felado: String
+	}, {
+		collection: 'DesignerBID'
+	});
 
 	var model = mongoose.model('DesignerBID', DesignerBID);
 

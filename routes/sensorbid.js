@@ -13,6 +13,9 @@ var endAuction = require('./admin.js').endAuction;
 var sensorContent = fs.readFileSync(path.join(__dirname, '../views/sensorBid.html'), 'utf-8');
 var sensorCompiled = ejs.compile(sensorContent);
 
+var sensorAdminContent = fs.readFileSync(path.join(__dirname, '../views/sensorBidAdmin.html'), 'utf-8');
+var sensorAdminCompiled = ejs.compile(sensorAdminContent);
+
 var SensorBid = function(app, io, Teams, SensorBID) {
 
     io.on('connection', function(socket) {
@@ -59,6 +62,11 @@ var SensorBid = function(app, io, Teams, SensorBID) {
             TeamID: req.user.TeamID
         }, function(error, user) {
             writeHead(res);
+            if(user.role === 'on') {
+                res.end(sensorAdminCompiled ({
+                    username: user.TeamFullName
+                }));
+            }
             res.end(sensorCompiled({
                 username: user.TeamFullName
             }));

@@ -25,21 +25,6 @@
       var inputs = [];
 
       for(var i = 0; i < priorityListForm.length - 1; i++) {
-        //Check if filled out
-        if(priorityListForm[i].value === null || priorityListForm[i].value === "") {
-          alert("All the fields must be filled out");
-          return false;
-        }
-        //Check if > 10
-        if(priorityListForm[i].value < 10) {
-          alert("The minimum value is 10");
-          return false;
-        }
-        //Check if < 1000
-        if(priorityListForm[i].value > 1000) {
-          alert("The maximum value is 1000");
-          return false;
-        }
         inputs.push(priorityListForm[i].value);
       }
 

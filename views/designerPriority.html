@@ -25,10 +25,13 @@
       var inputs = [];
 
       for(var i = 0; i < priorityListForm.length - 1; i++) {
-        inputs.push(priorityListForm[i].value);
+        inputs.push(parseInt(priorityListForm[i].value));
       }
 
-      inputs = inputs.sort();
+      inputs = inputs.sort(function(a, b){
+        return a-b;
+      });
+
       for (var j = 0; j < inputs.length - 1; j++) {
         //Check for duplicates
         if (inputs[j + 1] === inputs[j]) {

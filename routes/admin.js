@@ -265,8 +265,7 @@ var updatePriorityLists = function(PriorityList, TeamFullName, designer) {
         PriorityList.update({}, {
             $pull: {
                 list: {
-                    designer: "Designer Srác 1"
-                }
+                    designer: designer                }
             }
         }, {
             multi: true

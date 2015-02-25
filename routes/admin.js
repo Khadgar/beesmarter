@@ -50,6 +50,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                     var currentBid = sortedPriorityLists[0].list.sort(compareBids)[0];
                                     var currentBidLeader = sortedPriorityLists[0].team;
 
+                                    //Max value ne induljon mar 1200-rol, ha 600 a maxos bid ra..
                                     var maxValue = currentBid.value * 2;
                                     if(currentBid.value > 500) {
                                         maxValue = 1000;
@@ -58,6 +59,12 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                         }
                                     }
 
+                                    //Ha utso designer van hatra..viszont akkor is ennyit ir ki, ha
+                                    //meg csak 1 ember adta le a listat, erre kene egy bool, ami jelzi, hogy
+                                    //mindenki leadta
+                                    //ES ez a timer nemtom, hogy hogy mukodik, ha ugyanolyan ertek a min es max, mivel
+                                    // akkor a setTimeOutnal: ((maxBidValue - minBidValue) / step) * 1000 * stepTime)
+                                    //ez 0 lenne
                                     if(priorityLists.length === 1) {
                                         maxValue = currentBid.value + 10;
                                     }

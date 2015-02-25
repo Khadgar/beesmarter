@@ -50,11 +50,23 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                     var currentBid = sortedPriorityLists[0].list.sort(compareBids)[0];
                                     var currentBidLeader = sortedPriorityLists[0].team;
 
+                                    var maxValue = currentBid.value * 2;
+                                    if(currentBid.value > 500) {
+                                        maxValue = 1000;
+                                        if(currentBid.value === 1000) {
+                                            maxValue = 1010;
+                                        }
+                                    }
+
+                                    if(priorityLists.length === 1) {
+                                        maxValue = currentBid.value + 10;
+                                    }
+
                                     res.end(admincompiled({
                                         username: user.TeamFullName,
                                         designer: currentBid.designer,
                                         minValue: currentBid.value,
-                                        maxValue: currentBid.value * 2,
+                                        maxValue: maxValue,
                                         team: currentBidLeader,
                                         sensors: sensors
                                     }));
@@ -129,8 +141,6 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                         msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
                     });
                 });
-
-
 
             }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
             res.redirect('/admin');

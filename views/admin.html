@@ -30,6 +30,10 @@
     $('#bidSensorState').html(data.msg);
     socket.removeAllListeners('BIDSensorsuccess');
   });
+
+  function validateNumberInput(event) {
+    return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 0;
+  }
   </script>
   <body class= "allbgcolor">
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -70,24 +74,24 @@
             <br>
             <br>
             <div class="form-group"> Max Value:
-              <input type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Max Value" readonly class="form-control" name="maxValue" value=<%- maxValue %>>
+              <input type="text"  readonly class="form-control" name="maxValue" value=<%- maxValue %>>
             </div>
             <br>
             <div class="form-group"> Min Value:
-              <input type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Min Value" readonly class="form-control" name="minValue" value=<%- minValue %>>
+              <input type="text"  readonly class="form-control" name="minValue" value=<%- minValue %>>
             </div>
             <br>
             <div class="form-group"> Priority list bid leader:
-              <input type="text" placeholder="Team" readonly class="form-control" name="bidLeader" value=<%- teamQuoteName %>>
+              <input type="text" readonly class="form-control" name="bidLeader" value=<%- teamQuoteName %>>
             </div>
             <br>
             <div class="form-group"> Steptime(in seconds):
-              <input type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Step time(seconds)" class="form-control" name="stepTime">
+              <input type="text" onkeypress="return validateNumberInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required>
             </div>
             <br>
             <span>
             <div class="form-group"> Designer:
-              <input type="text" placeholder="Designer" readonly class="form-control" name="designer"  value=<%- designerQuoteName %>>
+              <input type="text" readonly class="form-control" name="designer"  value=<%- designerQuoteName %>>
             </div>
             <br>
             </span>
@@ -98,20 +102,22 @@
           </div>
         </form>
         <p id="bidDesignerState"></p>
+
+
         <h3 class="sub-header">Sensors</h3>
         <form class="form-inline" role="form" action="/startSensorAuction" method="post">
           <br>
           <br>
           <div class="form-group"> Max Value:
-            <input type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Max Value" class="form-control" name="maxValue">
+            <input type="text" onkeypress="return validateNumberInput(event)" placeholder="Max Value" class="form-control" name="maxValue" required>
           </div>
           <br>
           <div class="form-group"> Min Value:
-            <input type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Min Value" class="form-control" name="minValue">
+            <input type="text" onkeypress="return validateNumberInput(event)" placeholder="Min Value" class="form-control" name="minValue" required>
           </div>
           <br>
           <div class="form-group"> Step time(seconds):
-            <input type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57" placeholder="Step time(seconds)" class="form-control" name="stepTime">
+            <input type="text" onkeypress="return validateNumberInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required>
           </div>
           <br>
           <div id="sensorWrapper">
@@ -119,7 +125,7 @@
             <span>
             <% sensors.forEach(function(sensor){ var quoteName='"'+sensor.name+'"';%>
             <div class="radio">
-              <label><%= sensor.name %> <input type="radio" name="optradio" value=<%- quoteName %>></label>
+              <label><%= sensor.name %> <input type="radio" name="optradio" value=<%- quoteName %> required></label>
             </div>
             <br>
             <% }); %>

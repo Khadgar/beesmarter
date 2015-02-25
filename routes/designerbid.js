@@ -88,6 +88,10 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
     });
 
     app.post('/priorityList', isAuthenticated, function(req, res) {
+
+        //Le kell ellenorizni, minden field ki volt-e toltve, hogy 10-nel nagyobb es 1000-nel kisebb,
+        //  illetve, hogy kulonbozo ertekuek-e. Ez utobbira nem figyel a kliens oldal, a tobbire igen.
+
         Teams.findOne({
             TeamID: req.user.TeamID
         }, function(error, team) {
@@ -98,7 +102,6 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
                     value: req.body[key]
                 });
             }
-
             var newPriorityList = {
                 team: team.TeamFullName,
                 list: newList

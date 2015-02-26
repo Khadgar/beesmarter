@@ -14,7 +14,7 @@ var errorcompiled = ejs.compile(errorcontent);
 var admincontent = fs.readFileSync(path.join(__dirname, '../views/admin.html'), 'utf-8');
 var admincompiled = ejs.compile(admincontent);
 
-var canUpload = true;
+var canUpload = false;
 
 var teamCount = 3;
 var priorityListRoundFinished = false;
@@ -34,7 +34,7 @@ var bidSubject,
     priorityListLeader;
 
 
-var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerBID) {
+var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerBID, SensorBID) {
     app.get('/admin', isAuthenticated, function(req, res, next) {
         process.nextTick(function() {
             Teams.findOne({
@@ -45,7 +45,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                     Sensors.find().exec(function(err, sensors) {
                         PriorityList.find()
                             .exec(function(err, priorityLists) {
-                                if(priorityListRoundFinished) {
+                                if (priorityListRoundFinished) {
                                     console.log('priorityListRoundFinished');
                                 }
                                 if (priorityLists.length !== 0) {
@@ -222,9 +222,57 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
     });
 
     app.post('/reset', isAuthenticated, function(req, res, next) {
+        var canUpload = false;
+        var teamCount = 3;
+        var priorityListRoundFinished = false;
+        endAuction();
+
         //Designers -> reset maxBid, avrgBid, designerVote, appVote to zero
+        Designers.update({}, {
+            maxBid: 0,
+            avrgBid: 0,
+            designerVote: 0,
+            appVote: 0
+        }, {
+            multi: true
+        }, function(err, des) {
+            if (err) {
+                console.log(err);
+            }
+        });
+
         //Teams -> reset money to 1000, designer to undefined, teamVote, appVote to zero
+        Teams.update({}, {
+            money: 1000,
+            designer: null,
+            teamVote: 0,
+            appVote: 0
+        }, {
+            multi: true
+        }, function(err, des) {
+            if (err) {
+                console.log(err);
+            }
+        });
+
         //PriorityList, DesignerBID, SensorBID -> delete all
+        PriorityList.find({}, function(err, priorityLists) {
+            priorityLists.forEach(function(priorityList) {
+                priorityList.remove();
+            });
+        });
+
+        DesignerBID.find({}, function(err, designerbids) {
+            designerbids.forEach(function(designerbid) {
+                designerbid.remove();
+            });
+        });
+
+        SensorBID.find({}, function(err, sensorbids) {
+            sensorbids.forEach(function(sensorbid) {
+                sensorbid.remove();
+            });
+        });
 
         res.redirect('/admin');
     });
@@ -246,6 +294,7 @@ var endAuction = function() {
     maxBidValue = undefined;
     minBidValue = undefined;
     stepTime = undefined;
+    step = undefined;
     bidSubject = undefined;
     priorityListLeader = undefined;
 };
@@ -268,12 +317,14 @@ var handleDesignerBidSuccess = function(DesignerBID, PriorityList, Designers, de
     team.money -= value;
     team.save();
 
-    Designer.update({
+    Designers.update({
         name: designer
     }, {
         maxBid: value
     }, function(err, des) {
-
+        if (err) {
+            console.log(err);
+        }
     });
 
     updatePriorityLists(PriorityList, teamFullName, designer);

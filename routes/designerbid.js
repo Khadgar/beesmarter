@@ -119,7 +119,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
                             '_id': 0,
                             'name': 1
                         }).exec(function(err, designers) {
-                            var designersWithBids = getMaxDesignerBids(priorityLists, designers);
+                            var designersWithBids = getAvrgDesignerBids(priorityLists, designers);
                             addAvrgDesignerBids(Designers, designersWithBids);
                         });
                         io.emit('priorityListRoundFinished');

@@ -28,19 +28,19 @@
         inputs.push(parseInt(priorityListForm[i].value));
       }
 
-      inputs = inputs.sort(function(a, b){
+      /*inputs = inputs.sort(function(a, b){
         return a-b;
-      });
+      });*/
 
       for (var j = 0; j < inputs.length - 1; j++) {
-        //Check for duplicates
+        /*//Check for duplicates
         if (inputs[j]%5 !== 0) {
           alert("The values have to be divisible with 5");
           return false;
-        }
+        }*/
         //Check if difference in values is > 10
-        if (inputs[j + 1] - inputs[j] < 5) {
-          alert("The difference between the values has to be >= 5");
+        if (inputs[j + 1] === inputs[j]) {
+          alert("The values have to be unique");
           return false;
         }
       }

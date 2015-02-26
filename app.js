@@ -58,7 +58,7 @@ require(path.join(__dirname, './routes/login.js')).Login(app, passport);
 require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, DesignerBID, Teams, Designers, PriorityList);
 require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app, io, Teams, SensorBID);
 require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, PriorityList, DesignerBID, Designers, SensorBID);
-require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers, Sensors, PriorityList, DesignerBID);
+require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers, Sensors, PriorityList, DesignerBID, SensorBID);
 require(path.join(__dirname, './routes/upload.js')).Upload(app, Teams, ftpupload, busboy);
 
 

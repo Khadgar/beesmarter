@@ -1,17 +1,23 @@
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://beesmarter:beesmarter@ds039261.mongolab.com:39261/beesmarterdb');
 
-var PriorityList = require('./models/prioritylist.js')(mongoose);
+// var SensorBID = require('./models/sensorbid.js')(mongoose);
+// SensorBID.find({}, function(err, sensorbids) {
+//   sensorbids.forEach(function(sensorbid) {
+//     sensorbid.remove();
+//   });
+// });
 
-PriorityList.update({}, {
-  $pull: {
-    list: {
-      designer: "Designer Srác 1"
-    }
-  }
+var Teams = require('./models/team.js')(mongoose);
+Teams.update({
+  role: null
+}, {
+  money: 1000,
+  designer: null,
+  teamVote: 0,
+  appVote: 0
 }, {
   multi: true
-}, function(err, numberAffected) {
-  if (err) return console.log(err);
-  console.log('The number of updated documents was %d', numberAffected);
+}, function(err, des) {
+  console.log(err);
 });

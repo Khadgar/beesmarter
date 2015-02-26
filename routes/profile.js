@@ -63,8 +63,6 @@ var sortPriorityList = function(priorityList) {
 };
 
 var comparePriorityList = function(priorityList1, priorityList2) {
-    console.log(priorityList1.list);
-    console.log(priorityList2.list);
     var priorityList1Max = priorityList1.list.sort(compareBids)[0].value;
     var priorityList2Max = priorityList2.list.sort(compareBids)[0].value;
 

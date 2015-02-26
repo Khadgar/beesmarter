@@ -242,7 +242,9 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         });
 
         //Teams -> reset money to 1000, designer to undefined, teamVote, appVote to zero
-        Teams.update({}, {
+        Teams.update({
+            role: null
+        }, {
             money: 1000,
             designer: null,
             teamVote: 0,

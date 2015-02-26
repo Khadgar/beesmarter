@@ -6,9 +6,11 @@ module.exports = function(mongoose) {
 		TeamID: String,
 		Password: String,
 		TeamFullName: String,
+		broughtResult: Number,
 		money: Number,
 		designer: String,
-		voteResult: Number,
+		teamVote: Number,
+    appVote: Number,
 		role: String
 	}, {
 		collection: 'Teams'

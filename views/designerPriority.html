@@ -34,13 +34,13 @@
 
       for (var j = 0; j < inputs.length - 1; j++) {
         //Check for duplicates
-        if (inputs[j + 1] === inputs[j]) {
-          alert("The values have to be unique");
+        if (inputs[j]%5 !== 0) {
+          alert("The values have to be divisible with 5");
           return false;
         }
         //Check if difference in values is > 10
-        if (inputs[j + 1] - inputs[j] < 10) {
-          alert("The difference between the values has to be > 10");
+        if (inputs[j + 1] - inputs[j] < 5) {
+          alert("The difference between the values has to be >= 5");
           return false;
         }
       }
@@ -83,7 +83,7 @@
         <br>
         <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
         <div class="form-group">
-          <label><%= designer.name %> <input type="number" min="10" max="1000" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
+          <label><%= designer.name %> <input type="number" min="10" max="1000" step="5" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
         </div>
         <br>
         <% }); %>

@@ -13,6 +13,7 @@ var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
 var teamCount = require('./admin.js').teamCount;
 var handleDesignerBidSuccess = require('./admin.js').handleDesignerBidSuccess;
+var setPriorityListRoundFinished = require('./admin.js').setPriorityListRoundFinished;
 
 
 var sortPriorityList = require('./profile.js').sortPriorityList;
@@ -38,7 +39,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
 
         socket.on('BIDcheck', function(data) {
             var teamFullName = data.username;
-            handleDesignerBid(Teams, DesignerBID, PriorityList, teamFullName, io);
+            handleDesignerBid(Teams, DesignerBID, PriorityList, Designers, teamFullName, io);
 
         });
         socket.on('disconnect', function() {
@@ -119,9 +120,10 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
                             'name': 1
                         }).exec(function(err, designers) {
                             var designersWithBids = getMaxDesignerBids(priorityLists, designers);
-                            addMaxDesignerBids(Designers, designersWithBids);
+                            addAvrgDesignerBids(Designers, designersWithBids);
                         });
                         io.emit('priorityListRoundFinished');
+                        setPriorityListRoundFinished(true);
                     }
 
                 });
@@ -132,7 +134,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
     });
 };
 
-var handleDesignerBid = function(Teams, DesignerBID, PriorityList, teamFullName, io) {
+var handleDesignerBid = function(Teams, DesignerBID, PriorityList, Designers, teamFullName, io) {
     Teams.findOne({
         TeamFullName: teamFullName
     }, function(error, team) {
@@ -143,7 +145,7 @@ var handleDesignerBid = function(Teams, DesignerBID, PriorityList, teamFullName,
 
         var check = checkBid(value, minValue, money);
         if (check) {
-            handleDesignerBidSuccess(DesignerBID, PriorityList, designer, value, teamFullName, team);
+            handleDesignerBidSuccess(DesignerBID, PriorityList, Designers, designer, value, teamFullName, team);
             io.emit('BIDsuccess', {
                 msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
             });
@@ -168,11 +170,11 @@ var checkBid = function(value, minValue, money) {
     }
 };
 
-var getMaxDesignerBids = function(priorityLists, designers) {
+var getAvrgDesignerBids = function(priorityLists, designers) {
     var designersWithBids = designers.map(function(designer) {
         return {
             name: designer.name,
-            maxBid: 0
+            avrgBid: 0
         };
     });
 
@@ -180,9 +182,7 @@ var getMaxDesignerBids = function(priorityLists, designers) {
         priorityList.list.forEach(function(listElement) {
             designersWithBids.forEach(function(designerWithBids) {
                 if (listElement.designer === designerWithBids.name) {
-                    if (listElement.value > designerWithBids.maxBid) {
-                        designerWithBids.maxBid = listElement.value;
-                    }
+                    designerWithBids.avrgBid += listElement.value / teamCount;
                 }
             });
 
@@ -192,15 +192,19 @@ var getMaxDesignerBids = function(priorityLists, designers) {
     return designersWithBids;
 };
 
-var addMaxDesignerBids = function(Designers, designersWithBids) {
+var addAvrgDesignerBids = function(Designers, designersWithBids) {
     designersWithBids.forEach(function(designerWithBid) {
         Designers.update({
             name: designerWithBid.name
         }, {
-            maxBid: designerWithBid.maxBid
+            avrgBid: designerWithBid.avrgBid
         }, {
             multi: false
-        }, function(err) {});
+        }, function(err) {
+            if(err) {
+                console.log(err);
+            }
+        });
     });
 };
 

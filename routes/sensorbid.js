@@ -32,7 +32,6 @@ var SensorBid = function(app, io, Teams, SensorBID) {
 
                 var check = checkBid(value, minValue, money);
                 if (check) {
-                    endAuction();
                     var newsensorbid = {
                         name: getBidSubject(),
                         osszeg: value,
@@ -43,6 +42,8 @@ var SensorBid = function(app, io, Teams, SensorBID) {
 
                     team.money -= value;
                     team.save();
+
+                    endAuction();
 
                     io.emit('BIDSensorsuccess', {
                         msg: 'A BIDet ' + username + ' nyerte ' + value + '-ért'

@@ -5,7 +5,9 @@ module.exports = function(mongoose) {
   var Designer = new Schema({
     name: String,
     maxBid: Number,
-    voteResult: Number,
+    avrgBid: Number,
+    designerVote: Number,
+    appVote: Number
   }, {
     collection: 'Designers'
   });

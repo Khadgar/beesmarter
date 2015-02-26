@@ -17,6 +17,7 @@ var admincompiled = ejs.compile(admincontent);
 var canUpload = true;
 
 var teamCount = 3;
+var priorityListRoundFinished = false;
 
 
 //id of the running countdown
@@ -24,7 +25,7 @@ var maxBidValue,
     minBidValue,
     currentBidValue,
     stepTime,
-    step = 10;
+    step;
 
 var interval_id,
     timeout_id;
@@ -44,6 +45,9 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                     Sensors.find().exec(function(err, sensors) {
                         PriorityList.find()
                             .exec(function(err, priorityLists) {
+                                if(priorityListRoundFinished) {
+                                    console.log('priorityListRoundFinished');
+                                }
                                 if (priorityLists.length !== 0) {
 
                                     var sortedPriorityLists = sortPriorityList(priorityLists);
@@ -52,9 +56,9 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
 
                                     //Max value ne induljon mar 1200-rol, ha 600 a maxos bid ra..
                                     var maxValue = currentBid.value * 2;
-                                    if(currentBid.value > 500) {
+                                    if (currentBid.value > 500) {
                                         maxValue = 1000;
-                                        if(currentBid.value === 1000) {
+                                        if (currentBid.value === 1000) {
                                             maxValue = 1010;
                                         }
                                     }
@@ -65,7 +69,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                     //ES ez a timer nemtom, hogy hogy mukodik, ha ugyanolyan ertek a min es max, mivel
                                     // akkor a setTimeOutnal: ((maxBidValue - minBidValue) / step) * 1000 * stepTime)
                                     //ez 0 lenne
-                                    if(priorityLists.length === 1) {
+                                    if (priorityLists.length === 1) {
                                         maxValue = currentBid.value + 10;
                                     }
 
@@ -106,6 +110,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         priorityListLeader = req.body.bidLeader;
 
         if (!maxBidValue || !minBidValue || !stepTime || !bidSubject || !priorityListLeader) {
+            console.log("DesignerBid: some value is missing");
             res.redirect('/admin');
         } else {
             io.on('connection', function(socket) {
@@ -125,6 +130,8 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
             clearInterval(interval_id);
             clearTimeout(timeout_id);
 
+            step = 5;
+
             interval_id = setInterval(function() {
                 currentBidValue -= step;
                 io.emit('timer', {
@@ -143,7 +150,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                 }, function(error, team) {
                     var teamFullName = priorityListLeader;
                     var value = minBidValue;
-                    handleDesignerBidSuccess(DesignerBID, PriorityList, bidSubject, minBidValue, priorityListLeader, team);
+                    handleDesignerBidSuccess(DesignerBID, PriorityList, Designers, bidSubject, minBidValue, priorityListLeader, team);
                     io.emit('BIDsuccess', {
                         msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
                     });
@@ -162,6 +169,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         bidSubject = req.body.optradio;
 
         if (!maxBidValue || !minBidValue || !stepTime || !bidSubject) {
+            console.log("SensorBid: some value is missing");
             res.redirect('/admin');
         } else {
 
@@ -180,6 +188,8 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
 
             clearInterval(interval_id);
             clearTimeout(timeout_id);
+
+            step = 1;
 
             interval_id = setInterval(function() {
                 currentBidValue -= step;
@@ -210,6 +220,14 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         exports.canUpload = canUpload;
         res.redirect('/admin');
     });
+
+    app.post('/reset', isAuthenticated, function(req, res, next) {
+        //Designers -> reset maxBid, avrgBid, designerVote, appVote to zero
+        //Teams -> reset money to 1000, designer to undefined, teamVote, appVote to zero
+        //PriorityList, DesignerBID, SensorBID -> delete all
+
+        res.redirect('/admin');
+    });
 };
 
 
@@ -236,7 +254,7 @@ var getBidSubject = function() {
     return bidSubject;
 };
 
-var handleDesignerBidSuccess = function(DesignerBID, PriorityList, designer, value, teamFullName, team) {
+var handleDesignerBidSuccess = function(DesignerBID, PriorityList, Designers, designer, value, teamFullName, team) {
     endAuction();
     var newdesignerbid = {
         name: designer,
@@ -249,6 +267,14 @@ var handleDesignerBidSuccess = function(DesignerBID, PriorityList, designer, val
     team.designer = designer;
     team.money -= value;
     team.save();
+
+    Designer.update({
+        name: designer
+    }, {
+        maxBid: value
+    }, function(err, des) {
+
+    });
 
     updatePriorityLists(PriorityList, teamFullName, designer);
 };
@@ -265,7 +291,8 @@ var updatePriorityLists = function(PriorityList, TeamFullName, designer) {
         PriorityList.update({}, {
             $pull: {
                 list: {
-                    designer: designer                }
+                    designer: designer
+                }
             }
         }, {
             multi: true
@@ -275,6 +302,10 @@ var updatePriorityLists = function(PriorityList, TeamFullName, designer) {
             }
         });
     });
+};
+
+var setPriorityListRoundFinished = function(newValue) {
+    priorityListRoundFinished = newValue;
 };
 
 
@@ -288,5 +319,6 @@ exports.getBidSubject = getBidSubject;
 
 exports.canUpload = canUpload;
 exports.teamCount = teamCount;
+exports.setPriorityListRoundFinished = setPriorityListRoundFinished;
 
 exports.handleDesignerBidSuccess = handleDesignerBidSuccess;

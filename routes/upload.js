@@ -9,19 +9,29 @@ var uploadcompiled = ejs.compile(uploadcontent);
 var errorcontent = fs.readFileSync(path.join(__dirname, '../views/error.html'), 'utf-8');
 var errorcompiled = ejs.compile(errorcontent);
 var writeHead = require('./utils.js').writeHead;
+var completedUploads = {};
 
 var Upload = function(app, Teams, ftpupload, busboy) {
 
     app.get('/upload', isAuthenticated, function(req, res, next) {
         var canUpload = require('./admin.js').canUpload;
+
+
         if (canUpload) {
             Teams.findOne({
                 TeamID: req.user.TeamID
             }, function(error, user) {
-                writeHead(res);
-                res.end(uploadcompiled({
-                    username: user.TeamFullName
-                }));
+                if (user.role === 'on') {
+                    writeHead(res);
+                    res.end(errorcompiled({
+                        errormsg: 'You are the Admin. You don\'t have to upload anything!'
+                    }));
+                } else {
+                    writeHead(res);
+                    res.end(uploadcompiled({
+                        username: user.TeamFullName
+                    }));
+                }
             });
         } else {
             writeHead(res);
@@ -58,6 +68,8 @@ var Upload = function(app, Teams, ftpupload, busboy) {
                     password: 'bsadmin1234'
                 });
 
+                completedUploads[req.user.TeamID] = req.user.TeamID;
+                exports.completedUploads = completedUploads;
                 res.redirect('/upload');
             });
         });

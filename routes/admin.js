@@ -36,6 +36,7 @@ var bidSubject,
 
 var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerBID, SensorBID) {
     app.get('/admin', isAuthenticated, function(req, res, next) {
+        var completedUploads = require('./upload.js').completedUploads;
         process.nextTick(function() {
             Teams.findOne({
                 TeamID: req.user.TeamID
@@ -79,18 +80,22 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                         minValue: currentBid.value,
                                         maxValue: maxValue,
                                         team: currentBidLeader,
-                                        sensors: sensors
+                                        sensors: sensors,
+                                        completedUploads: completedUploads
                                     }));
+
                                 } else {
                                     res.end(admincompiled({
                                         username: user.TeamFullName,
                                         designer: false,
-                                        sensors: sensors
+                                        sensors: sensors,
+                                        completedUploads: completedUploads
                                     }));
                                 }
 
                             });
                     });
+
 
                 } else {
                     res.end(errorcompiled({
@@ -225,6 +230,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         var canUpload = false;
         var teamCount = 3;
         var priorityListRoundFinished = false;
+        require('./upload.js').completedUploads = {};
         endAuction();
 
         //Designers -> reset maxBid, avrgBid, designerVote, appVote to zero
@@ -275,6 +281,8 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                 sensorbid.remove();
             });
         });
+
+
 
         res.redirect('/admin');
     });

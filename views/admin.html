@@ -61,111 +61,122 @@
         </div>
       </nav>
       <div class="container">
-        <div>
-          <br>
-          <br>
-          <br>
-          <h3 class="sub-header">Designers</h3>
-          <p id = "priorityListRoundFinished"></p>
-          <% if (designer) { %>
-          <% var designerQuoteName='"'+designer+'"';%>
-          <% var teamQuoteName='"'+team+'"';%>
-          <form class="form-inline" role="form" action="/startDesignerAuction" method="post">
-            <br>
-            <br>
-            <div class="form-group"> Max Value:
-              <input type="text"  readonly class="form-control" name="maxValue" value=<%- maxValue %>>
+        <br>
+        <br>
+        <br>
+        <div class="row row-centered keret">
+          <div class="row row-centered">
+            <div class="col-xs-6 col-centered col-max">
+              <h3 class="sub-header other-color">Designers</h3>
+              <p id = "priorityListRoundFinished"></p>
+              <% if (designer) { %>
+              <% var designerQuoteName='"'+designer+'"';%>
+              <% var teamQuoteName='"'+team+'"';%>
+              <form class="form-inline" role="form" action="/startDesignerAuction" method="post">
+              <table style="width:100%">
+              <tr><td>Max Value:</td><td><div class="form-group"><input type="text"  readonly class="form-control" name="maxValue" value=<%- maxValue %>>
+                </div></td>
+              </tr>
+              <tr><td>Min Value:</td><td><div class="form-group"><input type="text"  readonly class="form-control" name="minValue" value=<%- minValue %>>
+                </div></td>
+              </tr>
+              <tr><td>Priority list bid leader:</td><td><div class="form-group"><input type="text" readonly class="form-control" name="bidLeader" value=<%- teamQuoteName %>>
+                </div></td>
+              </tr>
+              <tr><td>Steptime(in seconds):</td><td><div class="form-group"><input type="text" onkeypress="return validateNumberInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required>
+                </div></td>
+              </tr>
+              <tr><td>Designer:</td><td><div class="form-group"><input type="text" readonly class="form-control" name="designer"  value=<%- designerQuoteName %>></div></td>
+              </tr>
+              </table>
+                <button id= "startDesignerAuctionBTN" type="submit" class="btn btn-success">Start Designer Auction</button>
+                <% } else {%>
+                <div id="priorityListStatus"> The priority lists are empty</div>
+                <% } %>
+              </form>
+              <p id="bidDesignerState"></p>
             </div>
-            <br>
-            <div class="form-group"> Min Value:
-              <input type="text"  readonly class="form-control" name="minValue" value=<%- minValue %>>
-            </div>
-            <br>
-            <div class="form-group"> Priority list bid leader:
-              <input type="text" readonly class="form-control" name="bidLeader" value=<%- teamQuoteName %>>
-            </div>
-            <br>
-            <div class="form-group"> Steptime(in seconds):
-              <input type="text" onkeypress="return validateNumberInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required>
-            </div>
-            <br>
-            <span>
-            <div class="form-group"> Designer:
-              <input type="text" readonly class="form-control" name="designer"  value=<%- designerQuoteName %>>
-            </div>
-            <br>
-            </span>
-            <button id= "startDesignerAuctionBTN" type="submit" class="btn btn-success">Start Designer Auction</button>
-            <% } else {%>
-            <div id="priorityListStatus"> The priority lists are empty</div>
-            <% } %>
+            <div class="col-xs-6 col-centered col-max">
+              <h3 class="sub-header other-color">Sensors</h3>
+              <form class="form-inline" role="form" action="/startSensorAuction" method="post">
+                <table style="width:100%">
+                  <tr>
+                    <td>Max Value:</td><td><div class="form-group"><input type="text" onkeypress="return validateNumberInput(event)" placeholder="Max Value" class="form-control" name="maxValue" required></div></td>
+                  </tr>
+                  <tr>
+                    <td>Min Value:</td><td><div class="form-group"><input type="text" onkeypress="return validateNumberInput(event)" placeholder="Min Value" class="form-control" name="minValue" required></div></td>
+                  </tr>
+                </tr>
+                <tr>
+                  <td>Step time(seconds):</td><td><div class="form-group"><input type="text" onkeypress="return validateNumberInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required></div></td>
+                </tr>
+              </table>
+              <div id="sensorWrapper">
+                <% if (sensors) { %>
+                <span>
+                <% sensors.forEach(function(sensor){ var quoteName='"'+sensor.name+'"';%>
+                <div class="radio">
+                  <label><%= sensor.name %> <input type="radio" name="optradio" value=<%- quoteName %> required></label>
+                </div>
+                <br>
+                <% }); %>
+                </span>
+                <% } %>
+              </div>
+              <button type="submit" class="btn btn-success">Start Sensor Auction</button>
+            </form>
+            <p id="bidSensorState"></p>
           </div>
-        </form>
-        <p id="bidDesignerState"></p>
-
-
-        <h3 class="sub-header">Sensors</h3>
-        <form class="form-inline" role="form" action="/startSensorAuction" method="post">
-          <br>
-          <br>
-          <div class="form-group"> Max Value:
-            <input type="text" onkeypress="return validateNumberInput(event)" placeholder="Max Value" class="form-control" name="maxValue" required>
+        </div>
+        <div class="row row-centered">
+          <div class="col-xs-6 col-centered col-max">
+            <h3 class="sub-header other-color">START Upload</h3>
+            <form class="form-inline" role="form" action="/startUpload" method="post">
+              <button type="submit" class="btn btn-success">START Upload</button>
+            </form>
           </div>
-          <br>
-          <div class="form-group"> Min Value:
-            <input type="text" onkeypress="return validateNumberInput(event)" placeholder="Min Value" class="form-control" name="minValue" required>
+          <div class="col-xs-6 col-centered col-max">
+            <h3 class="sub-header other-color">STOP Upload</h3>
+            <form class="form-inline" role="form" action="/stopUpload" method="post">
+              <button type="submit" class="btn btn-danger">STOP Upload</button>
+            </form>
           </div>
-          <br>
-          <div class="form-group"> Step time(seconds):
-            <input type="text" onkeypress="return validateNumberInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required>
+        </div>
+        <div class="row row-centered">
+          <div class="col-xs-6 col-centered col-max">
+            <h3 class="sub-header other-color">RESET</h3>
+            <form class="form-inline" role="form" action="/reset" method="post">
+              <button type="submit" class="btn btn-danger">RESET</button>
+            </form>
           </div>
-          <br>
-          <div id="sensorWrapper">
-            <% if (sensors) { %>
-            <span>
-            <% sensors.forEach(function(sensor){ var quoteName='"'+sensor.name+'"';%>
-            <div class="radio">
-              <label><%= sensor.name %> <input type="radio" name="optradio" value=<%- quoteName %> required></label>
-            </div>
-            <br>
-            <% }); %>
-            </span>
-            <% } %>
+          <div class="col-xs-6 col-centered col-max">
+            <h3 class="sub-header other-color">Uploaded by</h3>
+            <p id="completedUploads"></p>
+            <% if(completedUploads){%>
+            <b><%=Object.keys(completedUploads)%></b>
+            <%} %>
           </div>
-          <button type="submit" class="btn btn-success">Start Sensor Auction</button>
-        </form>
-        <p id="bidSensorState"></p>
-        <h3 class="sub-header">START Upload</h3>
-        <form class="form-inline" role="form" action="/startUpload" method="post">
-          <button type="submit" class="btn btn-success">START Upload</button>
-        </form>
-        <h3 class="sub-header">STOP Upload</h3>
-        <form class="form-inline" role="form" action="/stopUpload" method="post">
-          <button type="submit" class="btn btn-danger">STOP Upload</button>
-        </form>
-        <h3 class="sub-header">RESET</h3>
-        <form class="form-inline" role="form" action="/reset" method="post">
-          <button type="submit" class="btn btn-danger">RESET</button>
-        </form>
+        </div>
       </div>
     </div>
-    <br>
-    <br><br>
-    <br>
-    <footer class="footer">
-      <center>
-      <img src="images/sap_logo.png" width="50">
-      <img src="images/logo_epam.png" width="50">
-      <img src="images/logo_ericsson.png" width="50">
-      <img src="images/logo_misys.png" width="50">
-      <img src="images/logo_netlife.png" width="50">
-      <img src="images/logo_vrtech_black.png" width="50">
-      <img src="images/logo_pcworld_black.png" width="50">
-      <img src="images/ITK_logo.svg" height="50" alt="PPKE-ITK">
-      <img src="images/logo_mome.png" width="50" alt="MOME">
-      <img src="images/logo_mave.png" width="50" alt="MAVE">
-      <img src="images/logo_eestec.png" width="50" alt="EESTEC LC Budapest">
-      </center>
-    </footer>
-  </body>
+  </div>
+  <br>
+  <br><br>
+  <br>
+  <footer class="footer">
+    <center>
+    <img src="images/sap_logo.png" width="50">
+    <img src="images/logo_epam.png" width="50">
+    <img src="images/logo_ericsson.png" width="50">
+    <img src="images/logo_misys.png" width="50">
+    <img src="images/logo_netlife.png" width="50">
+    <img src="images/logo_vrtech_black.png" width="50">
+    <img src="images/logo_pcworld_black.png" width="50">
+    <img src="images/ITK_logo.svg" height="50" alt="PPKE-ITK">
+    <img src="images/logo_mome.png" width="50" alt="MOME">
+    <img src="images/logo_mave.png" width="50" alt="MAVE">
+    <img src="images/logo_eestec.png" width="50" alt="EESTEC LC Budapest">
+    </center>
+  </footer>
+</body>
 </html>

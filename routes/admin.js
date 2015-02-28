@@ -81,7 +81,8 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                         maxValue: maxValue,
                                         team: currentBidLeader,
                                         sensors: sensors,
-                                        completedUploads: completedUploads
+                                        completedUploads: completedUploads,
+                                        teamCount: teamCount
                                     }));
 
                                 } else {
@@ -89,7 +90,8 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                         username: user.TeamFullName,
                                         designer: false,
                                         sensors: sensors,
-                                        completedUploads: completedUploads
+                                        completedUploads: completedUploads,
+                                        teamCount: teamCount
                                     }));
                                 }
 

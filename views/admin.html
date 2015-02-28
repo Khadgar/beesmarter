@@ -153,7 +153,11 @@
             <h3 class="sub-header other-color">Uploaded by</h3>
             <p id="completedUploads"></p>
             <% if(completedUploads){%>
-            <b><%=Object.keys(completedUploads)%></b>
+              <% if(Object.keys(completedUploads).length === teamCount){%>
+                <p class="other-color-success"><b>Everyone completed the upload!</b></p>
+              <%} else {%>
+                <b><%=Object.keys(completedUploads)%></b>
+              <%} %>
             <%} %>
           </div>
         </div>

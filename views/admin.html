@@ -23,7 +23,7 @@
     socket.removeAllListeners('priorityListRoundFinished');
   });
   socket.on('BIDsuccess', function(data) {
-    $('#messages').html(data.msg);
+    $('#messages').html(data.msg + " You can start the next Designer auctions after refresh!");
     socket.removeAllListeners('BIDsuccess');
   });
   socket.on('BIDSensorsuccess', function(data) {

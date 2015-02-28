@@ -14,27 +14,43 @@
     <script src="http://cdn.socket.io/socket.io-1.3.3.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/beesmarter.css">
   </head>
+
   <script>
   var socket = io();
   socket.on('priorityListRoundFinished', function() {
-    $('#priorityListRoundFinished').html("All the priority lists have been added, you can start the Designer auctions after refresh!");
-    $('#priorityListStatus').html("");
+    $('#messages').html("All the priority lists have been added, you can start the Designer auctions after refresh!");
     document.getElementById("startDesignerAuctionBTN").disabled = false;
     socket.removeAllListeners('priorityListRoundFinished');
   });
   socket.on('BIDsuccess', function(data) {
-    $('#bidDesignerState').html(data.msg);
+    $('#messages').html(data.msg);
     socket.removeAllListeners('BIDsuccess');
   });
   socket.on('BIDSensorsuccess', function(data) {
-    $('#bidSensorState').html(data.msg);
+    $('#messages').html(data.msg);
     socket.removeAllListeners('BIDSensorsuccess');
   });
 
   function validateNumberInput(event) {
-    return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 0;
+    var charCode = event.charCode;
+    return (charCode >= 48 && charCode <= 57) || charCode === 0;
+  }
+
+  function validateDoubleInput(event) {
+    var charCode = event.charCode;
+    return (charCode >= 48 && charCode <= 57) || charCode === 0 || charCode === 46;
+  }
+
+  function validateForm() {
+    var sensorBidForm = document.forms.sensorBidForm;
+
+    if (sensorBidForm[0].value <= sensorBidForm[1].value) {
+      alert("The maximum value has to be bigger, than the minimum value!");
+      return false;
+    }
   }
   </script>
+
   <body class= "allbgcolor">
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
@@ -64,11 +80,14 @@
         <br>
         <br>
         <br>
+
+        <h3>Messages</h3>
+        <div id="messages"></div>
+
         <div class="row row-centered keret">
           <div class="row row-centered">
             <div class="col-xs-6 col-centered col-max">
               <h3 class="sub-header other-color">Designers</h3>
-              <p id = "priorityListRoundFinished"></p>
               <% if (designer) { %>
               <% var designerQuoteName='"'+designer+'"';%>
               <% var teamQuoteName='"'+team+'"';%>
@@ -83,7 +102,7 @@
               <tr><td>Priority list bid leader:</td><td><div class="form-group"><input type="text" readonly class="form-control" name="bidLeader" value=<%- teamQuoteName %>>
                 </div></td>
               </tr>
-              <tr><td>Steptime(in seconds):</td><td><div class="form-group"><input type="text" onkeypress="return validateNumberInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required>
+              <tr><td>Steptime(in seconds):</td><td><div class="form-group"><input type="number" min="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required>
                 </div></td>
               </tr>
               <tr><td>Designer:</td><td><div class="form-group"><input type="text" readonly class="form-control" name="designer"  value=<%- designerQuoteName %>></div></td>
@@ -91,24 +110,25 @@
               </table>
                 <button id= "startDesignerAuctionBTN" type="submit" class="btn btn-success">Start Designer Auction</button>
                 <% } else {%>
-                <div id="priorityListStatus"> The priority lists are empty</div>
+                <div id="priorityListStatus"> <%= priorityListStatus %></div>
                 <% } %>
               </form>
-              <p id="bidDesignerState"></p>
             </div>
+
+
             <div class="col-xs-6 col-centered col-max">
               <h3 class="sub-header other-color">Sensors</h3>
-              <form class="form-inline" role="form" action="/startSensorAuction" method="post">
+              <form class="form-inline" name="sensorBidForm" role="form" action="/startSensorAuction" method="post" onsubmit="return validateForm()">
                 <table style="width:100%">
                   <tr>
-                    <td>Max Value:</td><td><div class="form-group"><input type="text" onkeypress="return validateNumberInput(event)" placeholder="Max Value" class="form-control" name="maxValue" required></div></td>
+                    <td>Max Value:</td><td><div class="form-group"><input type="number" min="0" max="1000" onkeypress="return validateNumberInput(event)" placeholder="Max Value" class="form-control" name="maxValue" required></div></td>
                   </tr>
                   <tr>
-                    <td>Min Value:</td><td><div class="form-group"><input type="text" onkeypress="return validateNumberInput(event)" placeholder="Min Value" class="form-control" name="minValue" required></div></td>
+                    <td>Min Value:</td><td><div class="form-group"><input type="number" min="0" max="1000" onkeypress="return validateNumberInput(event)" placeholder="Min Value" class="form-control" name="minValue" required></div></td>
                   </tr>
                 </tr>
                 <tr>
-                  <td>Step time(seconds):</td><td><div class="form-group"><input type="text" onkeypress="return validateNumberInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required></div></td>
+                  <td>Step time(seconds):</td><td><div class="form-group"><input type="number" min= "0.1" onkeypress="return validateDoubleInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required></div></td>
                 </tr>
               </table>
               <div id="sensorWrapper">
@@ -125,9 +145,10 @@
               </div>
               <button type="submit" class="btn btn-success">Start Sensor Auction</button>
             </form>
-            <p id="bidSensorState"></p>
           </div>
         </div>
+
+
         <div class="row row-centered">
           <div class="col-xs-6 col-centered col-max">
             <h3 class="sub-header other-color">START Upload</h3>

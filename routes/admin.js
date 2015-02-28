@@ -46,10 +46,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                     Sensors.find().exec(function(err, sensors) {
                         PriorityList.find()
                             .exec(function(err, priorityLists) {
-                                if (priorityListRoundFinished) {
-                                    console.log('priorityListRoundFinished');
-                                }
-                                if (priorityLists.length !== 0) {
+                                if (priorityLists.length !== 0 && priorityListRoundFinished) {
 
                                     var sortedPriorityLists = sortPriorityList(priorityLists);
                                     var currentBid = sortedPriorityLists[0].list.sort(compareBids)[0];
@@ -59,19 +56,6 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                     var maxValue = currentBid.value * 2;
                                     if (currentBid.value > 500) {
                                         maxValue = 1000;
-                                        if (currentBid.value === 1000) {
-                                            maxValue = 1010;
-                                        }
-                                    }
-
-                                    //Ha utso designer van hatra..viszont akkor is ennyit ir ki, ha
-                                    //meg csak 1 ember adta le a listat, erre kene egy bool, ami jelzi, hogy
-                                    //mindenki leadta
-                                    //ES ez a timer nemtom, hogy hogy mukodik, ha ugyanolyan ertek a min es max, mivel
-                                    // akkor a setTimeOutnal: ((maxBidValue - minBidValue) / step) * 1000 * stepTime)
-                                    //ez 0 lenne
-                                    if (priorityLists.length === 1) {
-                                        maxValue = currentBid.value + 10;
                                     }
 
                                     res.end(admincompiled({
@@ -86,18 +70,25 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                     }));
 
                                 } else {
+                                    var message;
+                                    if (priorityLists.length === 0) {
+                                        message = "The priority lists are empty.";
+                                    } else {
+                                        message = "Not all the teams have a priority list yet.";
+                                    }
+
                                     res.end(admincompiled({
                                         username: user.TeamFullName,
                                         designer: false,
                                         sensors: sensors,
                                         completedUploads: completedUploads,
-                                        teamCount: teamCount
+                                        teamCount: teamCount,
+                                        priorityListStatus: message
                                     }));
                                 }
 
                             });
                     });
-
 
                 } else {
                     res.end(errorcompiled({
@@ -116,56 +107,48 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         bidSubject = req.body.designer;
         priorityListLeader = req.body.bidLeader;
 
-        if (!maxBidValue || !minBidValue || !stepTime || !bidSubject || !priorityListLeader) {
-            console.log("DesignerBid: some value is missing");
-            res.redirect('/admin');
-        } else {
-            io.on('connection', function(socket) {
-                console.log('user disconnected , I\'m in admin.js, designerAuctionStarted');
-                io.emit('designerAuctionStarted', {
-                    designer: bidSubject,
-                    minBidValue: minBidValue,
-                    maxBidValue: currentBidValue,
-                    priorityListLeader: priorityListLeader
-                });
-
-                socket.once('disconnect', function() {
-                    console.log('user disconnected , I\'m in admin.js');
-                });
+        io.on('connection', function(socket) {
+            io.emit('designerAuctionStarted', {
+                designer: bidSubject,
+                minBidValue: minBidValue,
+                maxBidValue: currentBidValue,
+                priorityListLeader: priorityListLeader
             });
 
-            clearInterval(interval_id);
-            clearTimeout(timeout_id);
+            socket.once('disconnect', function() {});
+        });
 
-            step = 5;
+        clearInterval(interval_id);
+        clearTimeout(timeout_id);
 
-            interval_id = setInterval(function() {
-                currentBidValue -= step;
-                io.emit('timer', {
-                    value: currentBidValue
+        step = 5;
+
+        interval_id = setInterval(function() {
+            currentBidValue -= step;
+            io.emit('timer', {
+                value: currentBidValue
+            });
+        }, 1000 * stepTime);
+
+        timeout_id = setTimeout(function() {
+            currentBidValue -= step;
+            io.emit('timer', {
+                value: "End"
+            });
+
+            Teams.findOne({
+                TeamFullName: priorityListLeader
+            }, function(error, team) {
+                var teamFullName = priorityListLeader;
+                var value = minBidValue;
+                handleDesignerBidSuccess(DesignerBID, PriorityList, Designers, bidSubject, minBidValue, team);
+
+                io.emit('BIDsuccess', {
+                    msg: teamFullName + ' has won the bid for ' + bidSubject + ' for ' + value
                 });
-            }, 1000 * stepTime);
-
-            timeout_id = setTimeout(function() {
-                currentBidValue -= step;
-                io.emit('timer', {
-                    value: "Vége"
-                });
-
-                Teams.findOne({
-                    TeamFullName: priorityListLeader
-                }, function(error, team) {
-                    var teamFullName = priorityListLeader;
-                    var value = minBidValue;
-                    handleDesignerBidSuccess(DesignerBID, PriorityList, Designers, bidSubject, minBidValue, priorityListLeader, team);
-                    io.emit('BIDsuccess', {
-                        msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
-                    });
-                });
-
-            }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
-            res.redirect('/admin');
-        }
+            });
+        }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
+        res.redirect('/admin');
     });
 
     app.post('/startSensorAuction', isAuthenticated, function(req, res) {
@@ -175,45 +158,36 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         stepTime = req.body.stepTime;
         bidSubject = req.body.optradio;
 
-        if (!maxBidValue || !minBidValue || !stepTime || !bidSubject) {
-            console.log("SensorBid: some value is missing");
-            res.redirect('/admin');
-        } else {
-
-            io.on('connection', function(socket) {
-                console.log('user disconnected , I\'m in admin.js, sensorAuctionStarted');
-                io.emit('sensorAuctionStarted', {
-                    sensor: bidSubject,
-                    minBidValue: minBidValue,
-                    maxBidValue: currentBidValue
-                });
-
-                socket.once('disconnect', function() {
-                    console.log('user disconnected , I\'m in admin.js');
-                });
+        io.on('connection', function(socket) {
+            io.emit('sensorAuctionStarted', {
+                sensor: bidSubject,
+                minBidValue: minBidValue,
+                maxBidValue: currentBidValue
             });
 
-            clearInterval(interval_id);
-            clearTimeout(timeout_id);
+            socket.once('disconnect', function() {});
+        });
 
-            step = 1;
+        clearInterval(interval_id);
+        clearTimeout(timeout_id);
 
-            interval_id = setInterval(function() {
-                currentBidValue -= step;
-                io.emit('timer', {
-                    value: currentBidValue
-                });
-            }, 1000 * stepTime);
+        step = 1;
 
-            timeout_id = setTimeout(function() {
-                currentBidValue -= step;
-                endAuction();
-                io.emit('timer', {
-                    value: "Vége"
-                });
-            }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
-            res.redirect('/admin');
-        }
+        interval_id = setInterval(function() {
+            currentBidValue -= step;
+            io.emit('timer', {
+                value: currentBidValue
+            });
+        }, 1000 * stepTime);
+
+        timeout_id = setTimeout(function() {
+            currentBidValue -= step;
+            endAuction();
+            io.emit('timer', {
+                value: "End"
+            });
+        }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);
+        res.redirect('/admin');
     });
 
     app.post('/startUpload', isAuthenticated, function(req, res, next) {
@@ -229,9 +203,9 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
     });
 
     app.post('/reset', isAuthenticated, function(req, res, next) {
-        var canUpload = false;
-        var teamCount = 3;
-        var priorityListRoundFinished = false;
+        canUpload = false;
+        teamCount = 3;
+        priorityListRoundFinished = false;
         require('./upload.js').completedUploads = {};
         endAuction();
 
@@ -315,12 +289,32 @@ var getBidSubject = function() {
     return bidSubject;
 };
 
-var handleDesignerBidSuccess = function(DesignerBID, PriorityList, Designers, designer, value, teamFullName, team) {
+var checkBid = function(value, minValue, money) {
+    if (value) {
+        if (money < value) {
+            return {
+                returnValue: false,
+                message: 'You don\'t have enough money'
+            };
+        } else {
+            return {
+                returnValue: true
+            };
+        }
+    } else {
+        return {
+            returnValue: false,
+            message: 'The is no bidding currently!'
+        };
+    }
+};
+
+var handleDesignerBidSuccess = function(DesignerBID, PriorityList, Designers, designer, value, team) {
     endAuction();
     var newdesignerbid = {
         name: designer,
         osszeg: value,
-        felado: teamFullName
+        felado: team.TeamFullName
     };
     var designerbid = new DesignerBID(newdesignerbid);
     designerbid.save();
@@ -339,7 +333,7 @@ var handleDesignerBidSuccess = function(DesignerBID, PriorityList, Designers, de
         }
     });
 
-    updatePriorityLists(PriorityList, teamFullName, designer);
+    updatePriorityLists(PriorityList, team.TeamFullName, designer);
 };
 
 var updatePriorityLists = function(PriorityList, TeamFullName, designer) {
@@ -385,3 +379,4 @@ exports.teamCount = teamCount;
 exports.setPriorityListRoundFinished = setPriorityListRoundFinished;
 
 exports.handleDesignerBidSuccess = handleDesignerBidSuccess;
+exports.checkBid = checkBid;

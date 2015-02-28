@@ -9,6 +9,7 @@ var getCurrentValue = require('./admin.js').getCurrentValue;
 var getMinValue = require('./admin.js').getMinValue;
 var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
+var checkBid = require('./admin.js').checkBid;
 
 var sensorContent = fs.readFileSync(path.join(__dirname, '../views/sensorBid.html'), 'utf-8');
 var sensorCompiled = ejs.compile(sensorContent);
@@ -19,7 +20,6 @@ var sensorAdminCompiled = ejs.compile(sensorAdminContent);
 var SensorBid = function(app, io, Teams, SensorBID) {
 
     io.on('connection', function(socket) {
-        console.log('CONNECTED , sensorbid');
         socket.on('BIDSensorcheck', function(data) {
             var username = data.username;
 
@@ -29,11 +29,12 @@ var SensorBid = function(app, io, Teams, SensorBID) {
                 var value = getCurrentValue();
                 var minValue = getMinValue();
                 var money = team.money;
+                var sensor = getBidSubject();
 
                 var check = checkBid(value, minValue, money);
-                if (check) {
+                if (check.returnValue) {
                     var newsensorbid = {
-                        name: getBidSubject(),
+                        name: sensor,
                         osszeg: value,
                         felado: username
                     };
@@ -46,15 +47,14 @@ var SensorBid = function(app, io, Teams, SensorBID) {
                     endAuction();
 
                     io.emit('BIDSensorsuccess', {
-                        msg: 'A BIDet ' + username + ' nyerte ' + value + '-ért'
+                        msg: username + ' has won the bid for ' + sensor + ' for ' + value
                     });
                 } else {
-                    socket.emit('BIDSensorfail', 'A BID nem kerult rogzitesre');
+                    socket.emit('BIDSensorfail', 'The bid was not recorded. ' + check.message);
                 }
             });
         });
         socket.on('disconnect', function() {
-            console.log('DISCONNECTED , sensorbid');
         });
     });
 
@@ -73,18 +73,6 @@ var SensorBid = function(app, io, Teams, SensorBID) {
             }));
         });
     });
-};
-
-var checkBid = function(value, minValue, money) {
-    if (value) {
-        if (value <= minValue || money < value) {
-            return false;
-        } else {
-            return true;
-        }
-    } else {
-        return false;
-    }
 };
 
 exports.SensorBid = SensorBid;

@@ -13,6 +13,7 @@ var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
 var teamCount = require('./admin.js').teamCount;
 var handleDesignerBidSuccess = require('./admin.js').handleDesignerBidSuccess;
+var checkBid = require('./admin.js').checkBid;
 var setPriorityListRoundFinished = require('./admin.js').setPriorityListRoundFinished;
 
 
@@ -35,16 +36,13 @@ var designerWonCompiled = ejs.compile(designerWonContent);
 
 var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList) {
     io.on('connection', function(socket) {
-        console.log('CONNECTED , designerbid.js');
 
         socket.on('BIDcheck', function(data) {
             var teamFullName = data.username;
             handleDesignerBid(Teams, DesignerBID, PriorityList, Designers, teamFullName, io);
 
         });
-        socket.on('disconnect', function() {
-            console.log('DISCONNECTED , designerbid');
-        });
+        socket.on('disconnect', function() {});
     });
 
 
@@ -90,18 +88,42 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
 
     app.post('/priorityList', isAuthenticated, function(req, res) {
 
-        //Le kell ellenorizni, minden field ki volt-e toltve, hogy 10-nel nagyobb es 1000-nel kisebb,
-        //  illetve, hogy kulonbozo ertekuek-e. Mindegyikre figyel a kliens, de kiszedheti html-ből, hogy figyeljen
+        //Le kell ellenorizni, minden field ki volt-e toltve, hogy 5-nel nagyobb es 1000-nel kisebb,
+        //  illetve, hogy kulonbozo ertekuek-e es legalabb 5 a kulonbseg koztuk.
+        //Mindegyikre figyel a kliens, de kiszedheti html-ből
 
         Teams.findOne({
             TeamID: req.user.TeamID
         }, function(error, team) {
             var newList = [];
             for (var key in req.body) {
+                //Le kell ellenorizni, hogy ki van-e toltve
+                if(!req.body[key]) {
+                    console.log('Not all values have been filled out!');
+                    return res.redirect('/designer');
+                }
+                //Le kell ellenorizni, hogy szam-e
+                else if(!parseInt(req.body[key])) {
+                    console.log('Only numbers are valid values!');
+                    return res.redirect('/designer');
+                }
                 newList.push({
                     designer: key,
                     value: req.body[key]
                 });
+            }
+
+            //Le kell ellenorizni, minden field ki  5-nelnagyobb es 1000-nel kisebb,
+            //  illetve, hogy kulonbozo ertekuek-e es legalabb 5 a kulonbseg koztuk.
+            for (var i = 0; i < newList.length - 1; i++) {
+                var value = newList[i].value;
+                var nextValue = newList[i + 1].value;
+
+                if ((value >= 5 && value <=1000) && (Math.abs(value - nextValue) >= 5)) {
+                } else {
+                    console.log('The values have to be >= 5, <= 1000 and the differences have to be >= 5!');
+                    return res.redirect('/designer');
+                }
             }
             var newPriorityList = {
                 team: team.TeamFullName,
@@ -144,30 +166,15 @@ var handleDesignerBid = function(Teams, DesignerBID, PriorityList, Designers, te
         var money = team.money;
 
         var check = checkBid(value, minValue, money);
-        if (check) {
-            handleDesignerBidSuccess(DesignerBID, PriorityList, Designers, designer, value, teamFullName, team);
+        if (check.returnValue) {
+            handleDesignerBidSuccess(DesignerBID, PriorityList, Designers, designer, value, team);
             io.emit('BIDsuccess', {
-                msg: 'A BIDet ' + teamFullName + ' nyerte ' + value + '-ért'
+                msg: teamFullName + ' has won the bid for ' + designer + ' for ' + value
             });
         } else {
-            console.log('BidFail');
-            socket.emit('BIDfail', 'A BID nem kerult rogzitesre');
+            socket.emit('BIDfail', 'The bid was not recorded. ' + check.message);
         }
     });
-};
-
-
-
-var checkBid = function(value, minValue, money) {
-    if (value) {
-        if (value <= minValue || money < value) {
-            return false;
-        } else {
-            return true;
-        }
-    } else {
-        return false;
-    }
 };
 
 var getAvrgDesignerBids = function(priorityLists, designers) {
@@ -201,7 +208,7 @@ var addAvrgDesignerBids = function(Designers, designersWithBids) {
         }, {
             multi: false
         }, function(err) {
-            if(err) {
+            if (err) {
                 console.log(err);
             }
         });

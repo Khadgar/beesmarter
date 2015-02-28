@@ -22,24 +22,10 @@
 
     function validateForm() {
       var priorityListForm = document.forms.priorityListForm;
-      var inputs = [];
 
-      for(var i = 0; i < priorityListForm.length - 1; i++) {
-        inputs.push(parseInt(priorityListForm[i].value));
-      }
-
-      /*inputs = inputs.sort(function(a, b){
-        return a-b;
-      });*/
-
-      for (var j = 0; j < inputs.length - 1; j++) {
-        /*//Check for duplicates
-        if (inputs[j]%5 !== 0) {
-          alert("The values have to be divisible with 5");
-          return false;
-        }*/
-        //Check if difference in values is > 10
-        if (inputs[j + 1] === inputs[j]) {
+      for (var j = 0; j < priorityListForm.length - 1; j++) {
+        //Check for duplicates
+        if (priorityListForm[j + 1].value === priorityListForm[j].value) {
           alert("The values have to be unique");
           return false;
         }
@@ -83,7 +69,7 @@
         <br>
         <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
         <div class="form-group">
-          <label><%= designer.name %> <input type="number" min="10" max="1000" step="5" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
+          <label><%= designer.name %> <input type="number" min="5" max="1000" step="5" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
         </div>
         <br>
         <% }); %>

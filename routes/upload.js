@@ -10,6 +10,10 @@ var errorcontent = fs.readFileSync(path.join(__dirname, '../views/error.html'), 
 var errorcompiled = ejs.compile(errorcontent);
 var writeHead = require('./utils.js').writeHead;
 var completedUploads = {};
+//completedUploads.team1=[];
+//completedUploads.team2=[];
+//completedUploads.team3=[];
+
 
 var Upload = function(app, Teams, ftpupload, busboy) {
 
@@ -68,11 +72,17 @@ var Upload = function(app, Teams, ftpupload, busboy) {
                     password: 'bsadmin1234'
                 });
 
-                completedUploads[req.user.TeamID] = req.user.TeamID;
+                completedUploads[req.user.TeamID] = filename;
                 exports.completedUploads = completedUploads;
                 res.redirect('/upload');
             });
         });
+    });
+
+    app.post('/clearList', isAuthenticated, function(req, res, next) {
+        completedUploads={};
+        exports.completedUploads = completedUploads;
+        res.redirect('/admin');
     });
 
 };

@@ -147,6 +147,100 @@
           </div>
         </div>
 
+        <div class="row row-centered">
+          <div class="col-xs-6 col-centered col-max">
+              <h3 class="sub-header other-color">Team votes</h3>
+              <form class="form-inline" role="form" action="/teamVote" method="post">
+                <table style="width:100%">
+                  <tr>
+                    <td>Average vote:</td>
+                    <td>
+                      <div class="form-group">
+                        <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
+                      </div>
+                    </td>
+                  </tr>
+                </tr>
+              </table>
+              <div id="teamWrapper">
+                <span>
+                <% teams.forEach(function(team){ var quoteName='"'+team.TeamFullName+'"';%>
+                <div class="radio">
+                  <label><%= team.TeamFullName %>
+                    <input type="radio" name="optradio" value=<%- quoteName %> required>
+                  </label>
+                </div>
+                <br>
+                <% }); %>
+                </span>
+              </div>
+              <button type="submit" class="btn btn-success">Submit team vote</button>
+            </form>
+          </div>
+
+          <div class="col-xs-6 col-centered col-max">
+              <h3 class="sub-header other-color">Designer votes</h3>
+              <form class="form-inline" role="form" action="/designerVote" method="post">
+                <table style="width:100%">
+                  <tr>
+                    <td>Average vote:</td>
+                    <td>
+                      <div class="form-group">
+                        <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
+                      </div>
+                    </td>
+                  </tr>
+                </tr>
+              </table>
+              <div id="designerWrapper">
+                <span>
+                <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
+                <div class="radio">
+                  <label><%= designer.name %>
+                    <input type="radio" name="optradio" value=<%- quoteName %> required>
+                  </label>
+                </div>
+                <br>
+                <% }); %>
+                </span>
+              </div>
+              <button type="submit" class="btn btn-success">Submit designer vote</button>
+            </form>
+          </div>
+
+          <div class="col-xs-6 col-centered col-max">
+              <h3 class="sub-header other-color">Application votes</h3>
+              <form class="form-inline" role="form" action="/applicationVote" method="post">
+                <table style="width:100%">
+                  <tr>
+                    <td>Average vote:</td>
+                    <td>
+                      <div class="form-group">
+                        <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
+                      </div>
+                    </td>
+                  </tr>
+                </tr>
+              </table>
+              <div id="teamWrapper">
+                <span>
+                <% teams.forEach(function(team){ var quoteName='"'+team.TeamFullName+'"';%>
+                <div class="radio">
+                  <label><%= team.TeamFullName %>
+                    <input type="radio" name="optradio" value=<%- quoteName %> required>
+                  </label>
+                </div>
+                <br>
+                <% }); %>
+                </span>
+              </div>
+              <button type="submit" class="btn btn-success">Submit application vote</button>
+            </form>
+          </div>
+
+
+        </div>
+
 
         <div class="row row-centered">
           <div class="col-xs-6 col-centered col-max">

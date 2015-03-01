@@ -54,21 +54,27 @@
     </div>
 
     <!-- Result of  priorityLists-->
-     <div class="container">
+    <div class="container">
         <h2>Priority lists:</h2>
         <div id="priorityList">
         <% if (priorityLists) { %>
         <span>
-          <% priorityLists.forEach(function(priorityList){ %>
-            <div>
-              <label><%= priorityList.team %> <br>
-                <% priorityList.list.forEach(function(list){ %>
-                    <%=list.designer %>: <%=list.value %>,
-                <% }); %>
-              </label>
-            </div>
-            <br>
+          <table class="table table-bordered table-hover" style="width:100%">
+              <tr>
+                <th>Team</th>
+                <th>Priority list</th>
+              </tr>
+              <% priorityLists.forEach(function(priorityList){ %>
+              <tr>
+                <td><%= priorityList.team %></td>
+                <td>
+                  <% priorityList.list.forEach(function(list){ %>
+                      <%=list.designer %>: <%=list.value %>,
+                  <% }); %>
+                </td>
+              </tr>
           <% }); %>
+          </table>
         </span>
         <% } %>
         </div>

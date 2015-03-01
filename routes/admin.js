@@ -46,47 +46,57 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                     Sensors.find().exec(function(err, sensors) {
                         PriorityList.find()
                             .exec(function(err, priorityLists) {
-                                if (priorityLists.length !== 0 && priorityListRoundFinished) {
+                                Teams.find({
+                                    role: null
+                                }, function(err, teams) {
+                                    Designers.find({}, function(err, designers) {
 
-                                    var sortedPriorityLists = sortPriorityList(priorityLists);
-                                    var currentBid = sortedPriorityLists[0].list.sort(compareBids)[0];
-                                    var currentBidLeader = sortedPriorityLists[0].team;
+                                        if (priorityLists.length !== 0 && priorityListRoundFinished) {
 
-                                    //Max value ne induljon mar 1200-rol, ha 600 a maxos bid ra..
-                                    var maxValue = currentBid.value * 2;
-                                    if (currentBid.value > 500) {
-                                        maxValue = 1000;
-                                    }
+                                            var sortedPriorityLists = sortPriorityList(priorityLists);
+                                            var currentBid = sortedPriorityLists[0].list.sort(compareBids)[0];
+                                            var currentBidLeader = sortedPriorityLists[0].team;
 
-                                    res.end(admincompiled({
-                                        username: user.TeamFullName,
-                                        designer: currentBid.designer,
-                                        minValue: currentBid.value,
-                                        maxValue: maxValue,
-                                        team: currentBidLeader,
-                                        sensors: sensors,
-                                        completedUploads: completedUploads,
-                                        teamCount: teamCount
-                                    }));
+                                            //Max value ne induljon mar 1200-rol, ha 600 a maxos bid ra..
+                                            var maxValue = currentBid.value * 2;
+                                            if (currentBid.value > 500) {
+                                                maxValue = 1000;
+                                            }
 
-                                } else {
-                                    var message;
-                                    if (priorityLists.length === 0) {
-                                        message = "The priority lists are empty.";
-                                    } else {
-                                        message = "Not all the teams have a priority list yet.";
-                                    }
+                                            res.end(admincompiled({
+                                                username: user.TeamFullName,
+                                                designer: currentBid.designer,
+                                                minValue: currentBid.value,
+                                                maxValue: maxValue,
+                                                team: currentBidLeader,
+                                                sensors: sensors,
+                                                completedUploads: completedUploads,
+                                                teamCount: teamCount,
+                                                teams: teams,
+                                                designers: designers
+                                            }));
 
-                                    res.end(admincompiled({
-                                        username: user.TeamFullName,
-                                        designer: false,
-                                        sensors: sensors,
-                                        completedUploads: completedUploads,
-                                        teamCount: teamCount,
-                                        priorityListStatus: message
-                                    }));
-                                }
+                                        } else {
+                                            var message;
+                                            if (priorityLists.length === 0) {
+                                                message = "The priority lists are empty.";
+                                            } else {
+                                                message = "Not all the teams have a priority list yet.";
+                                            }
 
+                                            res.end(admincompiled({
+                                                username: user.TeamFullName,
+                                                designer: false,
+                                                sensors: sensors,
+                                                completedUploads: completedUploads,
+                                                teamCount: teamCount,
+                                                priorityListStatus: message,
+                                                teams: teams,
+                                                designers: designers
+                                            }));
+                                        }
+                                    });
+                                });
                             });
                     });
 
@@ -190,6 +200,62 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         res.redirect('/admin');
     });
 
+    app.post('/teamVote', isAuthenticated, function(req, res, next) {
+        averageVote = req.body.averageVote;
+        teamFullName = req.body.optradio;
+        Teams.update({
+            TeamFullName: teamFullName
+        }, {
+            teamVote: averageVote
+        }, function(err, des) {
+            if (err) {
+                console.log(err);
+            }
+        });
+
+        res.redirect('/admin');
+    });
+
+    app.post('/designerVote', isAuthenticated, function(req, res, next) {
+        averageVote = req.body.averageVote;
+        designerName = req.body.optradio;
+        Designers.update({
+            name: designerName
+        }, {
+            designerVote: averageVote
+        }, function(err, des) {
+            if (err) {
+                console.log(err);
+            }
+        });
+
+        res.redirect('/admin');
+    });
+
+    app.post('/applicationVote', isAuthenticated, function(req, res, next) {
+        averageVote = req.body.averageVote;
+        teamFullName = req.body.optradio;
+
+        Teams.findOne({
+            TeamFullName: teamFullName
+        }, function(err, team) {
+            team.appVote = averageVote;
+            team.save();
+
+            Designers.update({
+                name: team.designer
+            }, {
+                appVote: averageVote
+            }, function(err, des) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        });
+
+        res.redirect('/admin');
+    });
+
     app.post('/startUpload', isAuthenticated, function(req, res, next) {
         canUpload = true;
         exports.canUpload = canUpload;
@@ -257,8 +323,6 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                 sensorbid.remove();
             });
         });
-
-
 
         res.redirect('/admin');
     });

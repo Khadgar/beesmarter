@@ -17,6 +17,19 @@ var sensorCompiled = ejs.compile(sensorContent);
 var sensorAdminContent = fs.readFileSync(path.join(__dirname, '../views/sensorBidAdmin.html'), 'utf-8');
 var sensorAdminCompiled = ejs.compile(sensorAdminContent);
 
+var getCurrentDate = function() {
+       return new Date().toJSON().slice(0, 10);
+};
+
+var getCurrentTime = function() {
+       return new Date().toTimeString().slice(0, 8);
+};
+
+var getCurrentDateTime = function() {
+       return getCurrentDate() + ' ' + getCurrentTime();
+};
+
+
 var SensorBid = function(app, io, Teams, SensorBID) {
 
     io.on('connection', function(socket) {
@@ -36,7 +49,8 @@ var SensorBid = function(app, io, Teams, SensorBID) {
                     var newsensorbid = {
                         name: sensor,
                         osszeg: value,
-                        felado: username
+                        felado: username,
+                        datum: getCurrentDateTime()
                     };
                     var sensorbid = new SensorBID(newsensorbid);
                     sensorbid.save();

@@ -5,7 +5,8 @@ module.exports = function(mongoose) {
 	var SensorBID = new Schema({
 		name: String,
 		osszeg: Number,
-		felado: String
+		felado: String,
+		datum: Date
 	}, {
 		collection: 'SensorBID'
 	});

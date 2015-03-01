@@ -58,10 +58,11 @@
           </div><!--/.navbar-collapse -->
         </div>
       </nav>
-      <br>
-      <br>
-      <br>
-      <h3>Priority list:</h3>
+      <div class="jumbotron other-color">
+        <div class="container">
+          <h1>Priority list</h1>
+        </div>
+      </div>
       <div id="prioritylist"></div>
       <% if (designers) { %>
       <form class="form-inline" name="priorityListForm" onsubmit="return validateForm()" role="form" action="/priorityList" method="post">

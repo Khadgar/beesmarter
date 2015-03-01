@@ -24,7 +24,6 @@
       $('#currentPriorityListLeader').html(data.priorityListLeader);
       $('#currentDesignerValue').html(data.minBidValue);
       $('#counter').html(data.maxBidValue);
-      socket.removeAllListeners('designerAuctionStarted');
     });
     socket.on('BIDfail', function(msg) {
       $('#bidstate').html(msg);
@@ -33,6 +32,7 @@
       $('#bidstate').html(data.msg);
       socket.removeAllListeners('BIDsuccess');
       socket.removeAllListeners('BIDfail');
+      socket.removeAllListeners('designerAuctionStarted');
     });
     </script>
   </head>
@@ -66,12 +66,14 @@
           <h1>Designer bid</h1>
         </div>
       </div>
-      <h3><p>Current desinger:</p>
+      <h3><p>Current desinger, priority list leader, minimal value:</p>
       <div id="currentDesignerName">&nbsp</div>
       <div id="currentPriorityListLeader">&nbsp</div>
       <div id="currentDesignerValue">&nbsp</div>
+      </br>
       <p>Current bid value:</p>
       <div id="counter">&nbsp</div>
+      </br>
       <p id="bidstate">&nbsp</p></h3>
       <footer class="footer">
         <center>

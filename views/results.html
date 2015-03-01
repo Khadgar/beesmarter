@@ -80,16 +80,26 @@
         <div id="designerbids">
         <% if (designerbids) { %>
         <span>
-          <% designerbids.forEach(function(designerbid){ %>
-            <label>
-                  <%= designerbid.name %>: <%= designerbid.osszeg %> , <%= designerbid.felado %>
-            </label>
-            <br>
+          <table class="table table-bordered table-hover" style="width:100%">
+              <tr>
+                <th>Designer</th>
+                <th>Amount</th>
+                <th>Team</th>
+              </tr>
+              <% designerbids.forEach(function(designerbid){ %>
+              <tr>
+                <td><%= designerbid.name %></td>
+                <td><%= designerbid.osszeg %></td>
+                <td><%= designerbid.felado %></td>
+              </tr>
           <% }); %>
+          </table>
         </span>
         <% } %>
         </div>
      </div>
+
+
 
      <!-- Result of  sensorbids-->
      <div class="container">
@@ -97,12 +107,22 @@
         <div id="sensorbids">
         <% if (sensorbids) { %>
         <span>
-          <% sensorbids.forEach(function(sensorbid){ %>
-            <label>
-                  <%= sensorbid.name %>: <%= sensorbid.osszeg %> , <%= sensorbid.felado %>, <%= sensorbid.datum %>
-            </label>
-            <br>
+          <table class="table table-bordered table-hover" style="width:100%">
+              <tr>
+                <th>Date</th>
+                <th>Sensor</th>
+                <th>Amount</th>
+                <th>Team</th>
+              </tr>
+              <% sensorbids.forEach(function(sensorbid){ %>
+              <tr>
+                <td><%= sensorbid.datum %></td>
+                <td><%= sensorbid.name %></td>
+                <td><%= sensorbid.osszeg %></td>
+                <td><%= sensorbid.felado %></td>
+              </tr>
           <% }); %>
+          </table>
         </span>
         <% } %>
         </div>

@@ -6,7 +6,7 @@ module.exports = function(mongoose) {
 		name: String,
 		osszeg: Number,
 		felado: String,
-		datum: Date
+		datum: String
 	}, {
 		collection: 'SensorBID'
 	});

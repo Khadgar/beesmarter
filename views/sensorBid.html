@@ -17,7 +17,7 @@
     var socket = io();
     socket.on('timer', function(data) {
       $('#counter').html(data.value);
-      if (data.value === "Vége") {
+      if (data.value === "End") {
         document.getElementById("submitSensorBTN").disabled = true;
       }
     });
@@ -28,7 +28,6 @@
       if (data.sensor !== undefined) {
         document.getElementById("submitSensorBTN").disabled = false;
       }
-      socket.removeAllListeners('sensorAuctionStarted');
     });
     socket.on('BIDSensorfail', function(msg) {
       $('#bidstate').html(msg);
@@ -38,6 +37,7 @@
       document.getElementById("submitSensorBTN").disabled = true;
       socket.removeAllListeners('BIDSensorsuccess');
       socket.removeAllListeners('BIDSensorfail');
+      socket.removeAllListeners('sensorAuctionStarted');
     });
     $(document).ready(function() {
       var username = document.getElementById("username").innerHTML;
@@ -79,12 +79,17 @@
           <h1>Sensor bid</h1>
         </div>
       </div>
-      <h3><div id="currentSensorName">&nbsp</div>
-      <div id="currentSensorValue">&nbsp</div>
-      <p>Current bid value:</p>
-      <div id="counter">&nbsp</div>
-      <p id="bidstate">&nbsp</p></h3>
+      <h3>
+        <p>Sensor, minimal value:</p>
+        <div id="currentSensorName">&nbsp</div>
+        <div id="currentSensorValue">&nbsp</div>
+        </br>
+        <p>Current bid value:</p>
+        <div id="counter">&nbsp</div>
+      </h3>
       <button id= "submitSensorBTN" class="btn btn-success" disabled>BID</button>
+      </br>
+      <h3><p id="bidstate">&nbsp</p></h3>
       <footer class="footer">
         <center>
         <img src="images/sap_logo.png" width="50">

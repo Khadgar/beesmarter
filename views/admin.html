@@ -44,7 +44,7 @@
   function validateForm() {
     var sensorBidForm = document.forms.sensorBidForm;
 
-    if (sensorBidForm[0].value <= sensorBidForm[1].value) {
+    if (parseInt(sensorBidForm[0].value) <= parseInt(sensorBidForm[1].value)) {
       alert("The maximum value has to be bigger, than the minimum value!");
       return false;
     }
@@ -127,7 +127,7 @@
                   </tr>
                 </tr>
                 <tr>
-                  <td>Step time(seconds):</td><td><div class="form-group"><input type="number" min= "0.1" onkeypress="return validateDoubleInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required></div></td>
+                  <td>Step time(seconds):</td><td><div class="form-group"><input type="number" min= "0.1" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required></div></td>
                 </tr>
               </table>
               <div id="sensorWrapper">

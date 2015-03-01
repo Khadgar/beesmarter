@@ -304,7 +304,7 @@ var checkBid = function(value, minValue, money) {
     } else {
         return {
             returnValue: false,
-            message: 'The is no bidding currently!'
+            message: 'There is no bidding currently!'
         };
     }
 };

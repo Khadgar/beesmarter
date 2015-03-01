@@ -17,7 +17,7 @@
     var socket = io();
     socket.on('timer', function(data) {
       $('#counter').html(data.value);
-      if (data.value === "Vége") {
+      if (data.value === "End") {
         document.getElementById("submitDesignerBTN").disabled = true;
       }
     });
@@ -30,12 +30,10 @@
       if (data.designer !== undefined) {
         document.getElementById("submitDesignerBTN").disabled = false;
       }
-      socket.removeAllListeners('designerAuctionStarted');
     });
     $(document).ready(function() {
       var username = document.getElementById("username").innerHTML;
       $("#submitDesignerBTN").click(function() {
-        console.log('Bidckeck');
         socket.emit('BIDcheck', {
           username: username
         });
@@ -49,6 +47,7 @@
       document.getElementById("submitDesignerBTN").disabled = true;
       socket.removeAllListeners('BIDsuccess');
       socket.removeAllListeners('BIDfail');
+      socket.removeAllListeners('designerAuctionStarted');
     });
     </script>
   </head>
@@ -82,14 +81,17 @@
           <h1>Designer bid</h1>
         </div>
       </div>
-      <h3><p>Current desinger:</p></h3>
+      <h3><p>Current desinger, priority list leader, minimal value:</p></h3>
       <h3><div id="currentDesignerName">&nbsp</div></h3>
       <h3><div id="currentPriorityListLeader">&nbsp</div></h3>
       <h3><div id="currentDesignerValue">&nbsp</div></h3>
+      </br>
       <h3><p>Current bid value:</p></h3>
       <h3><div id="counter">&nbsp</div></h3>
-      <h3><p id="bidstate">&nbsp</p></h3>
       <button id= "submitDesignerBTN" class="btn btn-success" disabled>BID</button>
+      </br>
+      <h3><p id="bidstate">&nbsp</p></h3>
+
       <footer class="footer">
         <center>
         <img src="images/sap_logo.png" width="50">

@@ -22,7 +22,6 @@
       $('#currentSensorName').html(data.sensor);
       $('#currentSensorValue').html(data.minBidValue);
       $('#counter').html(data.maxBidValue);
-      socket.removeAllListeners('sensorAuctionStarted');
     });
     socket.on('BIDSensorfail', function(msg) {
       $('#bidstate').html(msg);
@@ -31,6 +30,7 @@
       $('#bidstate').html(data.msg);
       socket.removeAllListeners('BIDSensorsuccess');
       socket.removeAllListeners('BIDSensorfail');
+      socket.removeAllListeners('sensorAuctionStarted');
     });
     </script>
   </head>
@@ -64,11 +64,16 @@
           <h1>Sensor bid</h1>
         </div>
       </div>
-      <h3><div id="currentSensorName">&nbsp</div>
-      <div id="currentSensorValue">&nbsp</div>
-      <p>Current bid value:</p>
-      <div id="counter">&nbsp</div>
-      <p id="bidstate">&nbsp</p></h3>
+      <h3>
+        <p>Sensor, minimal value:</p>
+        <div id="currentSensorName">&nbsp</div>
+        <div id="currentSensorValue">&nbsp</div>
+        </br>
+        <p>Current bid value:</p>
+        <div id="counter">&nbsp</div>
+        </br>
+        <p id="bidstate">&nbsp</p>
+      </h3>
       <footer class="footer">
         <center>
         <img src="images/sap_logo.png" width="50">

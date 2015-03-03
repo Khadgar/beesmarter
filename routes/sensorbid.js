@@ -17,12 +17,17 @@ var sensorCompiled = ejs.compile(sensorContent);
 var sensorAdminContent = fs.readFileSync(path.join(__dirname, '../views/sensorBidAdmin.html'), 'utf-8');
 var sensorAdminCompiled = ejs.compile(sensorAdminContent);
 
+Date.prototype.addHours= function(h){
+    this.setHours(this.getHours()+h);
+    return this;
+}
+
 var getCurrentDate = function() {
        return new Date().toJSON().slice(0, 10);
 };
 
 var getCurrentTime = function() {
-       return new Date().toTimeString().slice(0, 8);
+       return new Date().addHours(1).toTimeString().slice(0, 8);
 };
 
 var getCurrentDateTime = function() {

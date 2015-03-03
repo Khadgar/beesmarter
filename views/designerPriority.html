@@ -28,6 +28,8 @@
         if (priorityListForm[j + 1].value === priorityListForm[j].value) {
           alert("The values have to be unique");
           return false;
+        }else{
+          $('#submitbtn').attr('disabled',true);
         }
       }
     }
@@ -74,7 +76,7 @@
         </div>
         <br>
         <% }); %>
-        <button type="submit" class="btn btn-success">Submit priority list</button>
+        <button type="submit" id="submitbtn" class="btn btn-success">Submit priority list</button>
       </form>
       <% } %>
 	  <div id="wrap" class="container">

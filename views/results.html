@@ -62,16 +62,17 @@
           <table class="table table-bordered table-hover" style="width:100%">
               <tr>
                 <th>Team</th>
-                <th>Priority list</th>
+                <!--colspan="12" number of designer -->
+                <th colspan="12">Priority list</th>
               </tr>
               <% priorityLists.forEach(function(priorityList){ %>
               <tr>
                 <td><%= priorityList.team %></td>
-                <td>
+
                   <% priorityList.list.forEach(function(list){ %>
-                      <%=list.designer %>: <%=list.value %>,
+                     <td><%=list.designer %>: <%=list.value %></td>
                   <% }); %>
-                </td>
+
               </tr>
           <% }); %>
           </table>

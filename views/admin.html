@@ -92,6 +92,8 @@
               <% var teamQuoteName='"'+team+'"';%>
               <form class="form-inline" role="form" action="/startDesignerAuction" method="post">
               <table style="width:100%">
+              <tr><td>Designer:</td><td><div class="form-group"><input type="text" readonly class="form-control" name="designer"  value=<%- designerQuoteName %>></div></td>
+              </tr>
               <tr><td>Max Value:</td><td><div class="form-group"><input type="text"  readonly class="form-control" name="maxValue" value=<%- maxValue %>>
                 </div></td>
               </tr>
@@ -103,8 +105,6 @@
               </tr>
               <tr><td>Steptime(in seconds):</td><td><div class="form-group"><input type="number" min="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required>
                 </div></td>
-              </tr>
-              <tr><td>Designer:</td><td><div class="form-group"><input type="text" readonly class="form-control" name="designer"  value=<%- designerQuoteName %>></div></td>
               </tr>
               </table>
                 <button id= "startDesignerAuctionBTN" type="submit" class="btn btn-success">Start Designer Auction</button>

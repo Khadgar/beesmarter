@@ -166,6 +166,7 @@ var handleDesignerBid = function(Teams, DesignerBID, PriorityList, Designers, te
         var money = team.money;
 
         var check = checkBid(value, minValue, money);
+
         if (check.returnValue) {
             handleDesignerBidSuccess(DesignerBID, PriorityList, Designers, designer, value, team);
             io.emit('BIDsuccess', {

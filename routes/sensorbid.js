@@ -17,21 +17,21 @@ var sensorCompiled = ejs.compile(sensorContent);
 var sensorAdminContent = fs.readFileSync(path.join(__dirname, '../views/sensorBidAdmin.html'), 'utf-8');
 var sensorAdminCompiled = ejs.compile(sensorAdminContent);
 
-Date.prototype.addHours= function(h){
-    this.setHours(this.getHours()+h);
+Date.prototype.addHours = function(h) {
+    this.setHours(this.getHours() + h);
     return this;
-}
+};
 
 var getCurrentDate = function() {
-       return new Date().toJSON().slice(0, 10);
+    return new Date().toJSON().slice(0, 10);
 };
 
 var getCurrentTime = function() {
-       return new Date().addHours(1).toTimeString().slice(0, 8);
+    return new Date().addHours(1).toTimeString().slice(0, 8);
 };
 
 var getCurrentDateTime = function() {
-       return getCurrentDate() + ' ' + getCurrentTime();
+    return getCurrentDate() + ' ' + getCurrentTime();
 };
 
 
@@ -50,7 +50,9 @@ var SensorBid = function(app, io, Teams, SensorBID) {
                 var sensor = getBidSubject();
 
                 var check = checkBid(value, minValue, money);
+
                 if (check.returnValue) {
+                    endAuction();
                     var newsensorbid = {
                         name: sensor,
                         osszeg: value,
@@ -63,8 +65,6 @@ var SensorBid = function(app, io, Teams, SensorBID) {
                     team.money -= value;
                     team.save();
 
-                    endAuction();
-
                     io.emit('BIDSensorsuccess', {
                         msg: username + ' has won the bid for ' + sensor + ' for ' + value
                     });
@@ -73,8 +73,7 @@ var SensorBid = function(app, io, Teams, SensorBID) {
                 }
             });
         });
-        socket.on('disconnect', function() {
-        });
+        socket.on('disconnect', function() {});
     });
 
     app.get('/sensor', isAuthenticated, function(req, res, next) {
@@ -82,8 +81,8 @@ var SensorBid = function(app, io, Teams, SensorBID) {
             TeamID: req.user.TeamID
         }, function(error, user) {
             writeHead(res);
-            if(user.role === 'on') {
-                res.end(sensorAdminCompiled ({
+            if (user.role === 'on') {
+                res.end(sensorAdminCompiled({
                     username: user.TeamFullName
                 }));
             }

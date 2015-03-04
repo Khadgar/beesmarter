@@ -196,6 +196,10 @@ var getAvrgDesignerBids = function(priorityLists, designers) {
         });
     });
 
+    designersWithBids.forEach(function(designerWithBids) {
+        designerWithBids.avrgBid = Math.round(designerWithBids.avrgBid * 1000) / 1000;
+    });
+
     return designersWithBids;
 };
 

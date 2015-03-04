@@ -23,14 +23,19 @@
     function validateForm() {
       var priorityListForm = document.forms.priorityListForm;
 
+      var uniqueValues = true;
       for (var j = 0; j < priorityListForm.length - 1; j++) {
         //Check for duplicates
         if (priorityListForm[j + 1].value === priorityListForm[j].value) {
-          alert("The values have to be unique");
-          return false;
-        }else{
-          $('#submitbtn').attr('disabled',true);
+          uniqueValues = false;
         }
+      }
+      if(uniqueValues) {
+        $('#submitbtn').attr('disabled',true);
+      }
+      else {
+        alert("The values have to be unique");
+        return false;
       }
     }
   </script>

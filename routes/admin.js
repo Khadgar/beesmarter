@@ -150,11 +150,12 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                 TeamFullName: priorityListLeader
             }, function(error, team) {
                 var teamFullName = priorityListLeader;
+                var designer = bidSubject;
                 var value = minBidValue;
                 handleDesignerBidSuccess(DesignerBID, PriorityList, Designers, bidSubject, minBidValue, team);
 
                 io.emit('BIDsuccess', {
-                    msg: teamFullName + ' has won the bid for ' + bidSubject + ' for ' + value
+                    msg: teamFullName + ' has won the bid for ' + designer + ' for ' + value
                 });
             });
         }, ((maxBidValue - minBidValue) / step) * 1000 * stepTime);

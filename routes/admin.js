@@ -73,7 +73,8 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                                 completedUploads: completedUploads,
                                                 teamCount: teamCount,
                                                 teams: teams,
-                                                designers: designers
+                                                designers: designers,
+                                                canUpload: canUpload
                                             }));
 
                                         } else {
@@ -92,7 +93,8 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                                 teamCount: teamCount,
                                                 priorityListStatus: message,
                                                 teams: teams,
-                                                designers: designers
+                                                designers: designers,
+                                                canUpload: canUpload
                                             }));
                                         }
                                     });

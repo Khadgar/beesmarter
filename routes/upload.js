@@ -10,16 +10,17 @@ var errorcontent = fs.readFileSync(path.join(__dirname, '../views/error.html'), 
 var errorcompiled = ejs.compile(errorcontent);
 var writeHead = require('./utils.js').writeHead;
 var completedUploads = {};
+var fileName;
 //completedUploads.team1=[];
 //completedUploads.team2=[];
 //completedUploads.team3=[];
-Date.prototype.addHours= function(h){
-    this.setHours(this.getHours()+h);
+Date.prototype.addHours = function(h) {
+    this.setHours(this.getHours() + h);
     return this;
 }
 
 var getCurrentTime = function() {
-       return new Date().addHours(1).toTimeString().slice(0, 8).replace(':', '').replace(':', '');
+    return new Date().addHours(1).toTimeString().slice(0, 8).replace(':', '').replace(':', '');
 };
 
 var Upload = function(app, Teams, ftpupload, busboy) {
@@ -38,10 +39,13 @@ var Upload = function(app, Teams, ftpupload, busboy) {
                         errormsg: 'You are the Admin. You don\'t have to upload anything!'
                     }));
                 } else {
+
                     writeHead(res);
                     res.end(uploadcompiled({
-                        username: user.TeamFullName
+                        username: user.TeamFullName,
+                        fileName: fileName
                     }));
+                    fileName = '';
                 }
             });
         } else {
@@ -60,7 +64,7 @@ var Upload = function(app, Teams, ftpupload, busboy) {
         req.busboy.on('file', function(fieldname, file, filename) {
             console.log("Uploading: " + filename);
             //temp dir of the files
-            fstream = fs.createWriteStream(path.join(__dirname, '../files/' + req.user.TeamID + '_' + filename));
+            fstream = fs.createWriteStream(path.join(__dirname, '../files/' + req.user.TeamID + '_' + getCurrentTime() + '_' + filename));
             file.pipe(fstream);
             var c = new ftpupload();
 
@@ -68,7 +72,7 @@ var Upload = function(app, Teams, ftpupload, busboy) {
                 c.on('ready', function() {
                     //ftp path of the file
 
-                    c.put(path.join(__dirname, '../files/' + req.user.TeamID + '_' + filename), req.user.TeamID + '_' +getCurrentTime()+'_'+filename, function(err) {
+                    c.put(path.join(__dirname, '../files/' + req.user.TeamID + '_' + filename), req.user.TeamID + '_' + getCurrentTime() + '_' + filename, function(err) {
                         if (err) throw err;
                         c.end();
                     });
@@ -79,16 +83,17 @@ var Upload = function(app, Teams, ftpupload, busboy) {
                     user: 'bsadmin@pc63.hu',
                     password: 'bsadmin1234'
                 });
-
+                fileName = filename;
                 completedUploads[req.user.TeamID] = filename;
                 exports.completedUploads = completedUploads;
+
                 res.redirect('/upload');
             });
         });
     });
 
     app.post('/clearList', isAuthenticated, function(req, res, next) {
-        completedUploads={};
+        completedUploads = {};
         exports.completedUploads = completedUploads;
         res.redirect('/admin');
     });

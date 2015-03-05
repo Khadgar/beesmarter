@@ -43,6 +43,9 @@
         <div class="container">
           <h1>Welcome <%= username %>!</h1>
           <h2>Upload your work here!</h2>
+          <% if(fileName){%>
+              <p class="other-color-success">Uploaded file: <%= fileName %>!</p>
+            <%}%>
           <br>
           <form action="/uploadFile" method="post" enctype="multipart/form-data">
             <h3>Select a file to upload:</h3>
@@ -54,7 +57,7 @@
       </div>
       <div id="wrap" class="container">
       </div>
-	  
+
 	  <!-- Site footer -->
 		<footer class="footer">
 			<div class="container">

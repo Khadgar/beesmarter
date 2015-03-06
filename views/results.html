@@ -183,7 +183,7 @@
                 <th>Application vote average</th>
                 <th>Sum</th>
               </tr>
-              <% teamResult.forEach(function(team){ var sum = team.broughtResult + Math.round(team.money * 0.3) + team.teamVote * 30 + team.appVote * 30;%>
+              <% teamResult.forEach(function(team){ var sum = Math.round(team.money * 1/3) + team.teamVote * 30 + team.appVote * 30;%>
               <tr>
                 <td><%= team.TeamFullName %></td>
                 <td><%= team.broughtResult %></td>

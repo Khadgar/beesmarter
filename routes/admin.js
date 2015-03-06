@@ -15,8 +15,6 @@ var admincontent = fs.readFileSync(path.join(__dirname, '../views/admin.html'), 
 var admincompiled = ejs.compile(admincontent);
 
 var canUpload = false;
-
-var teamCount = 3;
 var priorityListRoundFinished = false;
 
 
@@ -71,7 +69,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                                 team: currentBidLeader,
                                                 sensors: sensors,
                                                 completedUploads: completedUploads,
-                                                teamCount: teamCount,
+                                                teamCount: teams.length,
                                                 teams: teams,
                                                 designers: designers,
                                                 canUpload: canUpload
@@ -90,7 +88,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
                                                 designer: false,
                                                 sensors: sensors,
                                                 completedUploads: completedUploads,
-                                                teamCount: teamCount,
+                                                teamCount: teams.length,
                                                 priorityListStatus: message,
                                                 teams: teams,
                                                 designers: designers,
@@ -384,7 +382,6 @@ exports.endAuction = endAuction;
 exports.getBidSubject = getBidSubject;
 
 exports.canUpload = canUpload;
-exports.teamCount = teamCount;
 exports.setPriorityListRoundFinished = setPriorityListRoundFinished;
 
 exports.handleDesignerBidSuccess = handleDesignerBidSuccess;

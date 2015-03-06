@@ -11,13 +11,11 @@ var errorcompiled = ejs.compile(errorcontent);
 var writeHead = require('./utils.js').writeHead;
 var completedUploads = {};
 var fileName;
-//completedUploads.team1=[];
-//completedUploads.team2=[];
-//completedUploads.team3=[];
+
 Date.prototype.addHours = function(h) {
     this.setHours(this.getHours() + h);
     return this;
-}
+};
 
 var getCurrentTime = function() {
     return new Date().addHours(1).toTimeString().slice(0, 8).replace(':', '').replace(':', '');

@@ -11,7 +11,6 @@ var getCurrentValue = require('./admin.js').getCurrentValue;
 var getMinValue = require('./admin.js').getMinValue;
 var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
-var teamCount = require('./admin.js').teamCount;
 var handleDesignerBidSuccess = require('./admin.js').handleDesignerBidSuccess;
 var checkBid = require('./admin.js').checkBid;
 var setPriorityListRoundFinished = require('./admin.js').setPriorityListRoundFinished;
@@ -98,12 +97,12 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
             var newList = [];
             for (var key in req.body) {
                 //Le kell ellenorizni, hogy ki van-e toltve
-                if(!req.body[key]) {
+                if (!req.body[key]) {
                     console.log('Not all values have been filled out!');
                     return res.redirect('/designer');
                 }
                 //Le kell ellenorizni, hogy szam-e
-                else if(!parseInt(req.body[key])) {
+                else if (!parseInt(req.body[key])) {
                     console.log('Only numbers are valid values!');
                     return res.redirect('/designer');
                 }
@@ -119,8 +118,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
                 var value = newList[i].value;
                 var nextValue = newList[i + 1].value;
 
-                if ((value >= 5 && value <=500) && (Math.abs(value - nextValue) >= 5)) {
-                } else {
+                if ((value >= 5 && value <= 500) && (Math.abs(value - nextValue) >= 5)) {} else {
                     console.log('The values have to be >= 5, <= 1000 and the differences have to be >= 5!');
                     return res.redirect('/designer');
                 }
@@ -134,19 +132,24 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
             priorityList.save(function(err) {
 
                 PriorityList.find().exec(function(err, priorityLists) {
+                    Teams.count({
+                        role: null
+                    }, function(err, teamCount) {
+                        if (priorityLists.length === teamCount) {
 
-                    if (priorityLists.length === teamCount) {
+                            Designers.find().select({
+                                '_id': 0,
+                                'name': 1
+                            }).exec(function(err, designers) {
+                                var designersWithBids = getAvrgDesignerBids(priorityLists, designers, teamCount);
+                                addAvrgDesignerBids(Designers, designersWithBids);
+                            });
+                            io.emit('priorityListRoundFinished');
+                            setPriorityListRoundFinished(true);
+                        }
+                    });
 
-                        Designers.find().select({
-                            '_id': 0,
-                            'name': 1
-                        }).exec(function(err, designers) {
-                            var designersWithBids = getAvrgDesignerBids(priorityLists, designers);
-                            addAvrgDesignerBids(Designers, designersWithBids);
-                        });
-                        io.emit('priorityListRoundFinished');
-                        setPriorityListRoundFinished(true);
-                    }
+
 
                 });
             });
@@ -178,7 +181,7 @@ var handleDesignerBid = function(Teams, DesignerBID, PriorityList, Designers, te
     });
 };
 
-var getAvrgDesignerBids = function(priorityLists, designers) {
+var getAvrgDesignerBids = function(priorityLists, designers, teamCount) {
     var designersWithBids = designers.map(function(designer) {
         return {
             name: designer.name,
@@ -190,7 +193,7 @@ var getAvrgDesignerBids = function(priorityLists, designers) {
         priorityList.list.forEach(function(listElement) {
             designersWithBids.forEach(function(designerWithBids) {
                 if (listElement.designer === designerWithBids.name) {
-                    designerWithBids.avrgBid += listElement.value / teamCount;
+                    designerWithBids.avrgBid += listElement.value;
                 }
             });
 
@@ -198,7 +201,7 @@ var getAvrgDesignerBids = function(priorityLists, designers) {
     });
 
     designersWithBids.forEach(function(designerWithBids) {
-        designerWithBids.avrgBid = Math.round(designerWithBids.avrgBid);
+        designerWithBids.avrgBid = Math.round(designerWithBids.avrgBid / teamCount);
     });
 
     return designersWithBids;

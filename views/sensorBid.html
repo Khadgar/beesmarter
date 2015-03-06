@@ -27,6 +27,7 @@
       $('#counter').html(data.maxBidValue);
       if (data.sensor !== undefined) {
         document.getElementById("submitSensorBTN").disabled = false;
+        $('#bidstate').html("");
       }
     });
     socket.on('BIDSensorfail', function(msg) {

@@ -88,7 +88,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
 
     app.post('/priorityList', isAuthenticated, function(req, res) {
 
-        //Le kell ellenorizni, minden field ki volt-e toltve, hogy 5-nel nagyobb es 1000-nel kisebb,
+        //Le kell ellenorizni, minden field ki volt-e toltve, hogy 5-nel nagyobb es 500-nel kisebb=,
         //  illetve, hogy kulonbozo ertekuek-e es legalabb 5 a kulonbseg koztuk.
         //Mindegyikre figyel a kliens, de kiszedheti html-ből
 
@@ -119,7 +119,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
                 var value = newList[i].value;
                 var nextValue = newList[i + 1].value;
 
-                if ((value >= 5 && value <=1000) && (Math.abs(value - nextValue) >= 5)) {
+                if ((value >= 5 && value <=500) && (Math.abs(value - nextValue) >= 5)) {
                 } else {
                     console.log('The values have to be >= 5, <= 1000 and the differences have to be >= 5!');
                     return res.redirect('/designer');
@@ -198,7 +198,7 @@ var getAvrgDesignerBids = function(priorityLists, designers) {
     });
 
     designersWithBids.forEach(function(designerWithBids) {
-        designerWithBids.avrgBid = Math.round(designerWithBids.avrgBid * 1000) / 1000;
+        designerWithBids.avrgBid = Math.round(designerWithBids.avrgBid);
     });
 
     return designersWithBids;

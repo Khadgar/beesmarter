@@ -271,64 +271,6 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, DesignerB
         res.redirect('/admin');
     });
 
-    app.post('/reset', isAuthenticated, function(req, res, next) {
-        canUpload = false;
-        teamCount = 3;
-        priorityListRoundFinished = false;
-        require('./upload.js').completedUploads = {};
-        endAuction();
-
-        //Designers -> reset maxBid, avrgBid, designerVote, appVote to zero
-        Designers.update({}, {
-            maxBid: 0,
-            avrgBid: 0,
-            designerVote: 0,
-            appVote: 0
-        }, {
-            multi: true
-        }, function(err, des) {
-            if (err) {
-                console.log(err);
-            }
-        });
-
-        //Teams -> reset money to 1000, designer to undefined, teamVote, appVote to zero
-        Teams.update({
-            role: null
-        }, {
-            money: 1000,
-            designer: null,
-            teamVote: 0,
-            appVote: 0
-        }, {
-            multi: true
-        }, function(err, des) {
-            if (err) {
-                console.log(err);
-            }
-        });
-
-        //PriorityList, DesignerBID, SensorBID -> delete all
-        PriorityList.find({}, function(err, priorityLists) {
-            priorityLists.forEach(function(priorityList) {
-                priorityList.remove();
-            });
-        });
-
-        DesignerBID.find({}, function(err, designerbids) {
-            designerbids.forEach(function(designerbid) {
-                designerbid.remove();
-            });
-        });
-
-        SensorBID.find({}, function(err, sensorbids) {
-            sensorbids.forEach(function(sensorbid) {
-                sensorbid.remove();
-            });
-        });
-
-        res.redirect('/admin');
-    });
 };
 
 

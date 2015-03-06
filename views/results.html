@@ -150,7 +150,7 @@
                 <th>Application vote average</th>
                 <th>Sum</th>
               </tr>
-              <% designerResult.forEach(function(designer){ var sum = designer.maxBid + designer.avrgBid + designer.designerVote + designer.appVote;%>
+              <% designerResult.forEach(function(designer){ var sum = Math.round(designer.maxBid * 0.2) + Math.round(designer.avrgBid * 0.4) + designer.designerVote * 30 + designer.appVote * 30;%>
               <tr>
                 <td><%= designer.name %></td>
                 <td><%= designer.maxBid %></td>
@@ -183,7 +183,7 @@
                 <th>Application vote average</th>
                 <th>Sum</th>
               </tr>
-              <% teamResult.forEach(function(team){ var sum = team.broughtResult + team.money + team.teamVote + team.appVote;%>
+              <% teamResult.forEach(function(team){ var sum = team.broughtResult + Math.round(team.money * 0.3) + team.teamVote * 30 + team.appVote * 30;%>
               <tr>
                 <td><%= team.TeamFullName %></td>
                 <td><%= team.broughtResult %></td>

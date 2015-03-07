@@ -36,6 +36,9 @@ var Profile = function(app, io, Teams, PriorityList, DesignerBID, Designers, Sen
                                     var competitorTeams = teams.filter(function(team) {
                                         return !team.role;
                                     });
+                                    if(competitorTeams.length !== currentPriorityList.length) {
+                                        currentPriorityList = [];
+                                    }
                                     res.end(profilecompiled({
                                         username: user.TeamFullName,
                                         priorityLists: currentPriorityList,

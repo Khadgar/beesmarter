@@ -50,6 +50,7 @@ var DesignerBid = function(app, io, DesignerBID, Teams, Designers, PriorityList)
             TeamID: req.user.TeamID
         }, function(error, team) {
             writeHead(res);
+            // Ha mar van a csapatnak designere
             if (team.designer) {
                 res.end(designerWonCompiled({
                     username: team.TeamFullName

@@ -36,13 +36,20 @@ var Profile = function(app, io, Teams, PriorityList, DesignerBID, Designers, Sen
                                     var competitorTeams = teams.filter(function(team) {
                                         return !team.role;
                                     });
+                                    // Ha admin jogom van
+                                    var displayNone = "";
+                                    // Ha nincsen
+                                    if(!user.role) {
+                                        displayNone = "display:none;";
+                                    }
                                     res.end(profilecompiled({
                                         username: user.TeamFullName,
                                         priorityLists: currentPriorityList,
                                         designerbids: designerBids,
                                         sensorbids: sensorBids,
                                         designerResult: designers,
-                                        teamResult: competitorTeams
+                                        teamResult: competitorTeams,
+                                        displayNone: displayNone
                                     }));
                                 });
 

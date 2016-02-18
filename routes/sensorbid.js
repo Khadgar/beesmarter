@@ -9,13 +9,6 @@ var getCurrentValue = require('./admin.js').getCurrentValue;
 var getMinValue = require('./admin.js').getMinValue;
 var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
-var checkBid = require('./admin.js').checkBid;
-
-var sensorContent = fs.readFileSync(path.join(__dirname, '../views/sensorBid.html'), 'utf-8');
-var sensorCompiled = ejs.compile(sensorContent);
-
-var sensorAdminContent = fs.readFileSync(path.join(__dirname, '../views/sensorBidAdmin.html'), 'utf-8');
-var sensorAdminCompiled = ejs.compile(sensorAdminContent);
 
 Date.prototype.addHours = function(h) {
     this.setHours(this.getHours() + h);
@@ -35,7 +28,7 @@ var getCurrentDateTime = function() {
 };
 
 
-var SensorBid = function(app, io, Teams, SensorBID) {
+var SensorBid = function(app, io, Teams, SensorBID, Users) {
 
     io.on('connection', function(socket) {
         socket.on('BIDSensorcheck', function(data) {
@@ -77,20 +70,43 @@ var SensorBid = function(app, io, Teams, SensorBID) {
     });
 
     app.get('/sensor', isAuthenticated, function(req, res, next) {
-        Teams.findOne({
-            TeamID: req.user.TeamID
+        Users.findOne({
+            ID: req.user.ID
         }, function(error, user) {
             writeHead(res);
-            if (user.role === 'on') {
-                res.end(sensorAdminCompiled({
-                    username: user.TeamFullName
-                }));
+            if (user.role === "admin") {
+                res.render('sensorBidAdmin', {
+                    username: user.name,
+                    path: "/sensor"
+                });
+            } else {
+                res.render('sensorBid', {
+                    username: user.name,
+                    path: "/sensor"
+                });
             }
-            res.end(sensorCompiled({
-                username: user.TeamFullName
-            }));
         });
     });
+};
+
+var checkBid = function(value, minValue, money) {
+    if (value) {
+        if (money < value) {
+            return {
+                returnValue: false,
+                message: 'You don\'t have enough money'
+            };
+        } else {
+            return {
+                returnValue: true
+            };
+        }
+    } else {
+        return {
+            returnValue: false,
+            message: 'There is no bidding currently!'
+        };
+    }
 };
 
 exports.SensorBid = SensorBid;

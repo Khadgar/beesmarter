@@ -3,60 +3,50 @@ var path = require('path');
 var ejs = require('ejs');
 var util = require('util');
 
-var profilecontent = fs.readFileSync(path.join(__dirname, '../views/results.html'), 'utf-8');
-var profilecompiled = ejs.compile(profilecontent);
-
 var writeHead = require('./utils.js').writeHead;
 var isAuthenticated = require('./login.js').isAuthenticated;
 
-var Profile = function(app, io, Teams, PriorityList, DesignerBID, Designers, SensorBID) {
+
+var Profile = function(app, io, Teams, PriorityList, Designers, SensorBID, Users) {
 
     app.get('/', isAuthenticated, function(req, res, next) {
         res.redirect('/results');
     });
 
     app.get('/results', isAuthenticated, function(req, res, next) {
-        Teams.findOne({
-            TeamID: req.user.TeamID
+        Users.findOne({
+            ID: req.user.ID
         }, function(error, user) {
             writeHead(res);
 
             PriorityList.find().select({
                 '_id': 0,
-                'team': 1,
+                'designerName': 1,
                 'list': 1
             }).exec(
                 function(err, priorityLists) {
-                    var currentPriorityList = sortPriorityList(priorityLists);
+                    SensorBID.find().exec(function(err, sensorBids) {
+                        Designers.find().exec(function(err, designers) {
 
-                    DesignerBID.find().exec(function(err, designerBids) {
-                        SensorBID.find().exec(function(err, sensorBids) {
-                            Designers.find().exec(function(err, designers) {
-                                Teams.find().exec(function(err, teams) {
-                                    var competitorTeams = teams.filter(function(team) {
-                                        return !team.role;
-                                    });
-                                    // Ha admin jogom van
-                                    var displayNone = "";
-                                    // Ha nincsen
-                                    if(!user.role) {
-                                        displayNone = "display:none;";
-                                    }
-                                    res.end(profilecompiled({
-                                        username: user.TeamFullName,
-                                        priorityLists: currentPriorityList,
-                                        designerbids: designerBids,
-                                        sensorbids: sensorBids,
-                                        designerResult: designers,
-                                        teamResult: competitorTeams,
-                                        displayNone: displayNone
-                                    }));
+                            var currentPriorityList = [];
+                            // Ha mindenki leadta a listajat vagy, ha admin vagyok
+                            if (priorityLists.length === designers.length || user.role == "admin") {
+                                currentPriorityList = sortPriorityList(priorityLists);
+                            }
+
+                            Teams.find().exec(function(err, teams) {
+                                res.render('results', {
+                                    username: user.name,
+                                    priorityLists: currentPriorityList,
+                                    sensorbids: sensorBids,
+                                    designerResult: designers,
+                                    teamResult: teams,
+                                    path: "/results",
+                                    role: user.role
                                 });
-
                             });
+
                         });
-
-
                     });
                 }
             );

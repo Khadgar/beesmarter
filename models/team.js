@@ -4,7 +4,6 @@ module.exports = function(mongoose) {
 	var Schema = mongoose.Schema;
 	var Team = new Schema({
 		TeamID: String,
-		Password: String,
 		TeamFullName: String,
 		broughtResult: Number,
 		money: Number,

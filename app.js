@@ -14,15 +14,27 @@ var io = require('socket.io')(http);
 var ftpupload = require('ftp');
 var busboy = require('connect-busboy');
 
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+
 //configure the app
 app.set('port', process.env.PORT || 3000);
-app.use(express.cookieParser('dandroid'));
-app.use(express.session({
-  secret: 'cookie_secret'
+
+app.use(cookieParser('dandroid'));
+
+app.use(session({
+  secret: 'cookie_secret',
+    resave: true,
+    saveUninitialized: true
 }));
+
+// set the view engine to ejs
+app.set('view engine', 'ejs');
+
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(busboy());
@@ -35,13 +47,13 @@ app.use(busboy());
 //host https://mongolab.com
 mongoose.connect('mongodb://beesmarter:beesmarter@ds039261.mongolab.com:39261/beesmarterdb');
 
+var Users = require(path.join(__dirname, './models/user.js'))(mongoose);
+
 var Teams = require(path.join(__dirname, './models/team.js'))(mongoose);
 
 var Designers = require(path.join(__dirname, './models/designer.js'))(mongoose);
 
 var Sensors = require(path.join(__dirname, './models/sensors.js'))(mongoose);
-
-var DesignerBID = require(path.join(__dirname, './models/designerbid.js'))(mongoose);
 
 var SensorBID = require(path.join(__dirname, './models/sensorbid.js'))(mongoose);
 
@@ -51,15 +63,15 @@ var PriorityList = require(path.join(__dirname, './models/prioritylist.js'))(mon
 require(path.join(__dirname, './routes/assets.js')).Assest(app);
 
 //authentication in auth.js
-require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Teams);
+require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Users);
 
 //routing in routes.js
 require(path.join(__dirname, './routes/login.js')).Login(app, passport);
-require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, DesignerBID, Teams, Designers, PriorityList);
-require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app, io, Teams, SensorBID);
-require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, PriorityList, DesignerBID, Designers, SensorBID);
-require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers, Sensors, PriorityList, DesignerBID, SensorBID);
-require(path.join(__dirname, './routes/upload.js')).Upload(app, Teams, ftpupload, busboy);
+require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, Teams, Designers, PriorityList, Users);
+require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app, io, Teams, SensorBID, Users);
+require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, PriorityList, Designers, SensorBID, Users);
+require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers, Sensors, PriorityList, SensorBID, Users);
+require(path.join(__dirname, './routes/upload.js')).Upload(app, Teams, ftpupload, Users, busboy);
 
 
 //create server

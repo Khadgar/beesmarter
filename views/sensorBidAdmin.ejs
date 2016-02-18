@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include ejs/head %>
+  </head>
+    <script>
+      var socket = io();
+      socket.on('timer', function(data) {
+        $('#counter').html(data.value);
+      });
+      socket.on('sensorAuctionStarted', function(data) {
+        $('#currentSensorName').html(data.sensor);
+        $('#currentSensorValue').html(data.minBidValue);
+        $('#counter').html(data.maxBidValue);
+      });
+      socket.on('BIDSensorfail', function(msg) {
+        $('#bidstate').html(msg);
+      });
+      socket.on('BIDSensorsuccess', function(data) {
+        $('#bidstate').html(data.msg);
+        socket.removeAllListeners('BIDSensorsuccess');
+        socket.removeAllListeners('BIDSensorfail');
+        socket.removeAllListeners('sensorAuctionStarted');
+      });
+    </script>
+
+  <body class= "allbgcolor">
+    <% include ejs/adminMenu %>
+      <div class="jumbotron other-color">
+        <div class="container">
+          <h1>Sensor bid</h1>
+        </div>
+      </div>
+    <div id="wrap" class="container">
+      <table class="table table-bordered table-hover" style="width:100%">
+        <tr><th>Sensor</th><th>Minimal Value</th></tr>
+        <tr><td><div id="currentSensorName">&nbsp</div></td>
+        <td><div id="currentSensorValue">&nbsp</div></td></tr>
+      </table>
+      <h3>
+        <p>Current bid value:</p>
+        <div id="counter">&nbsp</div>
+      </h3>
+      <h3><p id="bidstate">&nbsp</p></h3>
+    </div>
+    <!-- Site footer -->
+    <footer class="footer">
+      <% include ejs/footer %>
+    </footer>
+    </body>
+  </html>

@@ -1,0 +1,36 @@
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/"><img style="max-width:100px; margin-top: -40px"
+         src="/images/beesmarter.png"></a>
+       </div>
+       <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+
+          <!-- Request came for /results-->
+          <% if (path === "/results") { %>
+            <li class="active"><a id="username" href="/results"><%= username %></a></li>
+            <li><a href="/sensor">Sensor</a></li>
+            <li><a href="/upload">Upload</a></li>
+          <!-- Request came for /sensor-->
+          <% } else if(path === "/sensor"){ %>
+            <li><a id="username" href="/results"><%= username %></a></li>
+            <li class="active"><a href="/sensor">Sensor</a></li>
+            <li><a href="/upload">Upload</a></li>
+          <!-- Request came for /upload-->
+          <% } else { %>
+            <li><a id="username" href="/results"><%= username %></a></li>
+            <li><a href="/sensor">Sensor</a></li>
+            <li class="active"><a href="/upload">Upload</a></li>
+          <% } %>
+          <li><a href="/logout">Logout</a></li>
+        </ul>
+      </div><!--/.navbar-collapse -->
+    </div>
+  </nav>

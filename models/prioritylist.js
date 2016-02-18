@@ -3,9 +3,10 @@ var mongoose = require('mongoose');
 module.exports = function(mongoose) {
     var Schema = mongoose.Schema;
     var PriorityList = new Schema({
-        team: String,
+        designerName: String,
+        createdAt: Date,
         list: [{
-            designer: String,
+            team: String,
             value: Number
         }]
     }, {

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <% include ejs/head %>
+</head>
+<body class= "allbgcolor">
+<% include ejs/teamMenu %>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron other-color">
+      <div class="container">
+        <h1>Welcome <%= username %>!</h1>
+        <h2>Upload your work here!</h2>
+        <% if(fileName){%>
+        <p class="other-color-success">Uploaded file: <%= fileName %>!</p>
+        <%}%>
+        <br>
+        <form action="/uploadFile" method="post" enctype="multipart/form-data">
+          <h3>Select a file to upload:</h3>
+          <input type="file" name="fileToUpload" id="fileToUpload">
+          <br><br>
+          <input type="submit" class="btn btn-success" value="Upload File" name="submit">
+        </form>
+      </div>
+    </div>
+    <div id="wrap" class="container">
+    </div>
+
+    <!-- Site footer -->
+    <footer class="footer">
+     <% include ejs/footer %>
+   </footer>
+
+ </body>
+ </html>

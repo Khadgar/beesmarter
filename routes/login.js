@@ -1,5 +1,7 @@
 var path = require('path');
 
+var writeHead = require('./utils.js').writeHead;
+
 var isAuthenticated = function(req, res, next) {
     if (req.isAuthenticated())
         return next();
@@ -8,7 +10,8 @@ var isAuthenticated = function(req, res, next) {
 
 var Login = function(app, passport) {
     app.get('/login', function(req, res) {
-        res.sendfile(path.join(__dirname, '../views/index.html'));
+        writeHead(res);
+        res.render('index');
     });
 
     app.post('/login',

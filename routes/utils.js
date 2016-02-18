@@ -1,7 +1,5 @@
 var writeHead = function(res) {
-  res.writeHead(200, {
-    'Content-Type': 'text/html'
-  });
+  res.status(200);
 };
 
 

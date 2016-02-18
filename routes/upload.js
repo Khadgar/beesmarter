@@ -3,12 +3,8 @@ var path = require('path');
 var ejs = require('ejs');
 
 var isAuthenticated = require('./login.js').isAuthenticated;
-
-var uploadcontent = fs.readFileSync(path.join(__dirname, '../views/upload.html'), 'utf-8');
-var uploadcompiled = ejs.compile(uploadcontent);
-var errorcontent = fs.readFileSync(path.join(__dirname, '../views/error.html'), 'utf-8');
-var errorcompiled = ejs.compile(errorcontent);
 var writeHead = require('./utils.js').writeHead;
+
 var completedUploads = {};
 var fileName;
 
@@ -21,36 +17,29 @@ var getCurrentTime = function() {
     return new Date().addHours(1).toTimeString().slice(0, 8).replace(':', '').replace(':', '');
 };
 
-var Upload = function(app, Teams, ftpupload, busboy) {
+var Upload = function(app, Teams, ftpupload, Users, busboy) {
 
     app.get('/upload', isAuthenticated, function(req, res, next) {
         var canUpload = require('./admin.js').canUpload;
 
 
         if (canUpload) {
-            Teams.findOne({
-                TeamID: req.user.TeamID
+            Users.findOne({
+                ID: req.user.ID
             }, function(error, user) {
-                if (user.role === 'on') {
-                    writeHead(res);
-                    res.end(errorcompiled({
-                        errormsg: 'You are the Admin. You don\'t have to upload anything!'
-                    }));
-                } else {
-
-                    writeHead(res);
-                    res.end(uploadcompiled({
-                        username: user.TeamFullName,
-                        fileName: fileName
-                    }));
-                    fileName = '';
-                }
+                writeHead(res);
+                res.render('upload', {
+                    username: user.name,
+                    fileName: fileName,
+                    path: "/upload"
+                });
+                fileName = '';
             });
         } else {
             writeHead(res);
-            res.end(errorcompiled({
+            res.render('error', {
                 errormsg: 'Time is up!'
-            }));
+            });
         }
     });
 

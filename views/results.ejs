@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <% include ejs/head %>
+</head>
+
+<body class= "allbgcolor">
+
+    <!-- Request came from admin-->
+  <% if (role === "admin") { %>
+    <% include ejs/adminMenu %>
+    <!-- Request came from designer-->
+  <% } else if (role === "designer") { %>
+    <% include ejs/designerMenu %>
+    <!-- Request came from team-->
+  <% } else { %>
+    <% include ejs/teamMenu %>
+  <%} %>
+
+  <!-- Main jumbotron for a primary marketing message or call to action -->
+  <div class="jumbotron other-color">
+    <div class="container">
+      <h1>Welcome <%= username %>!</h1>
+    </div>
+  </div>
+
+  <!-- Result of  priorityLists-->
+  <div class="container">
+    <h2>Priority lists:</h2>
+    <div id="priorityList">
+      <% if (priorityLists) { %>
+      <span>
+        <table class="table table-bordered table-hover" style="width:100%">
+          <tr>
+            <th>Designer</th>
+            <!--colspan="12" number of designer -->
+            <th colspan="12">Priority list</th>
+          </tr>
+          <% priorityLists.forEach(function(priorityList){ %>
+          <tr>
+            <td><%= priorityList.designerName %></td>
+
+            <% priorityList.list.forEach(function(list){ %>
+            <td><%=list.team %>: <%=list.value %></td>
+            <% }); %>
+
+          </tr>
+          <% }); %>
+        </table>
+      </span>
+      <% } %>
+    </div>
+  </div>
+
+
+
+  <!-- Result of  sensorbids-->
+  <div class="container">
+    <h2>Sensor bids:</h2>
+    <div id="sensorbids">
+      <% if (sensorbids) { %>
+      <span>
+        <table class="table table-bordered table-hover" style="width:100%">
+          <tr>
+            <th>Date</th>
+            <th>Sensor</th>
+            <th>Amount</th>
+            <th>Team</th>
+          </tr>
+          <% sensorbids.forEach(function(sensorbid){ %>
+          <tr>
+            <td><%= sensorbid.datum %></td>
+            <td><%= sensorbid.name %></td>
+            <td><%= sensorbid.osszeg %></td>
+            <td><%= sensorbid.felado %></td>
+          </tr>
+          <% }); %>
+        </table>
+      </span>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Result of  designers-->
+  <div class="container">
+    <h2>Designer results:</h2>
+    <div id="designerResult">
+      <% if (designerResult) { %>
+      <span>
+        <table class="table table-bordered table-hover" style="width:100%">
+          <tr>
+            <th>Designer</th>
+            <th>Max bid</th>
+            <th>Avarage bid</th>
+            <th>Designer vote average</th>
+            <th>Application vote average</th>
+            <th>Sum</th>
+          </tr>
+          <% designerResult.forEach(function(designer){ var sum = Math.round(designer.maxBid * 0.2) + Math.round(designer.avrgBid * 0.4) + designer.designerVote * 30 + designer.appVote * 30;%>
+          <tr>
+            <td><%= designer.name %></td>
+            <td><%= designer.maxBid %></td>
+            <td><%= designer.avrgBid%></td>
+            <td><%= designer.designerVote %></td>
+            <td><%= designer.appVote%></td>
+            <td><%= sum %></td>
+          </tr>
+          <% }); %>
+        </table>
+      </span>
+      <% } %>
+    </div>
+  </div>
+
+
+  <!-- Result of  teams-->
+  <div id="wrap"  class="container">
+    <h2>Team results:</h2>
+    <div id="teamResult">
+      <% if (teamResult) { %>
+      <span>
+        <table class="table table-bordered table-hover" style="width:100%">
+          <tr>
+            <th>Team</th>
+            <th>Brought result</th>
+            <th>Money</th>
+            <th>Designer</th>
+            <th>Team vote average</th>
+            <th>Application vote average</th>
+            <th>Sum</th>
+          </tr>
+          <% teamResult.forEach(function(team){ var sum = Math.round(team.money * 1/3) + team.teamVote * 30 + team.appVote * 30;%>
+          <tr>
+            <td><%= team.TeamFullName %></td>
+            <td><%= team.broughtResult %></td>
+            <td><%= team.money %></td>
+            <% if (team.designer) { %>
+            <td><%= team.designer %></td>
+            <% } else {%>
+            <td></td>
+            <% }%>
+            <td><%= team.teamVote%></td>
+            <td><%= team.appVote%></td>
+            <td><%= sum %></td>
+          </tr>
+          <% }); %>
+        </table>
+      </span>
+      <% } %>
+    </div>
+  </div>
+  <br/>
+
+
+  <footer class="footer">
+   <% include ejs/footer %>
+ </footer>
+
+</body>
+</html>

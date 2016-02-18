@@ -1,10 +1,10 @@
-module.exports = function(passport, LocalStrategy, Teams) {
+module.exports = function(passport, LocalStrategy, Users) {
 
 	passport.use(new LocalStrategy(
 		function(username, password, done) {
 			process.nextTick(function() {
-				Teams.findOne({
-						'TeamID': username
+				Users.findOne({
+						'ID': username
 					},
 					function(err, user) {
 						if (err) {
@@ -14,7 +14,7 @@ module.exports = function(passport, LocalStrategy, Teams) {
 						if (!user) {
 							return done(null, false);
 						}
-						if (user.TeamID != username) {
+						if (user.ID != username) {
 							console.log('Error in username');
 							return done(null, false);
 						}
@@ -33,7 +33,7 @@ module.exports = function(passport, LocalStrategy, Teams) {
 	});
 
 	passport.deserializeUser(function(id, done) {
-		Teams.findById(id, function(err, user) {
+		Users.findById(id, function(err, user) {
 			done(err, user);
 		});
 	});

@@ -36,6 +36,7 @@
         <h1>Priority list</h1>
       </div>
     </div>
+    <% include ejs/curve %>
     <div id="prioritylist"></div>
     <% if (teams) { %>
     <form class="form-inline" name="priorityListForm" onsubmit="return validateForm()" role="form" action="/priorityList" method="post">

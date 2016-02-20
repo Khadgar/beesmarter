@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <% include ejs/head %>
-</head>
-<body class= "allbgcolor">
-  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+  <head>
+    <% include ejs/head %>
+  </head>
+  <body class= "allbgcolor">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
           <span class="sr-only">Toggle navigation</span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="/"><img style="max-width:100px; margin-top: -40px"
+          </button>
+          <a class="navbar-brand" href="/"><img style="max-width:100px; margin-top: -40px"
           src="/images/beesmarter.png"></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
@@ -29,20 +29,21 @@
             </div>
             <button type="submit" class="btn btn-success">Sign in</button>
           </form>
-        </div><!--/.navbar-collapse -->
+          </div><!--/.navbar-collapse -->
+        </div>
+      </nav>
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class="jumbotron other-color">
+        <div class="container">
+          <h1>Welcome!</h1>
+          <p>This application is a part of the BeeSmarter contest. Good luck! :)</p>
+        </div>
       </div>
-    </nav>
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron other-color">
-      <div class="container">
-        <h1>Welcome!</h1>
-        <p>This application is a part of the BeeSmarter contest. Good luck! :)</p>
+      <% include ejs/curve %>
+      <div id="wrap" class="container">
       </div>
-    </div>
-    <div id="wrap" class="container">
-    </div>
-    <footer class="footer">
-     <% include ejs/footer %>
-   </footer>
- </body>
- </html>
+      <footer class="footer">
+        <% include ejs/footer %>
+      </footer>
+    </body>
+  </html>

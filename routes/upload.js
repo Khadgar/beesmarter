@@ -14,7 +14,7 @@ Date.prototype.addHours = function(h) {
 };
 
 var getCurrentTime = function() {
-    return new Date().addHours(1).toTimeString().slice(0, 8).replace(':', '').replace(':', '');
+    return new Date().toLocaleTimeString().slice(0, 8).replace(':', '').replace(':', '');
 };
 
 var Upload = function(app, Teams, ftpupload, Users, busboy) {
@@ -46,32 +46,17 @@ var Upload = function(app, Teams, ftpupload, Users, busboy) {
     app.post('/uploadFile', isAuthenticated, function(req, res, next) {
 
         var fstream;
-        console.log(req.user.TeamID);
+        console.log(req.user.ID);
         req.pipe(req.busboy);
         req.busboy.on('file', function(fieldname, file, filename) {
             console.log("Uploading: " + filename);
             //temp dir of the files
-            fstream = fs.createWriteStream(path.join(__dirname, '../files/' + req.user.TeamID + '_' + getCurrentTime() + '_' + filename));
+            fstream = fs.createWriteStream(path.join(__dirname, '../files/' + req.user.ID + '_' + getCurrentTime() + '_' + filename));
             file.pipe(fstream);
-            var c = new ftpupload();
 
             fstream.on('close', function() {
-                c.on('ready', function() {
-                    //ftp path of the file
 
-                    c.put(path.join(__dirname, '../files/' + req.user.TeamID + '_' + filename), req.user.TeamID + '_' + getCurrentTime() + '_' + filename, function(err) {
-                        if (err) throw err;
-                        c.end();
-                    });
-                });
-
-                c.connect({
-                    host: 'ftp.25.hu',
-                    user: 'bsadmin@pc63.hu',
-                    password: 'bsadmin1234'
-                });
-                fileName = filename;
-                completedUploads[req.user.TeamID] = filename;
+                completedUploads[req.user.ID] = filename;
                 exports.completedUploads = completedUploads;
 
                 res.redirect('/upload');

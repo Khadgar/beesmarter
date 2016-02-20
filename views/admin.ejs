@@ -47,6 +47,7 @@
           <div> <%- message %> </div>
         </div>
       </div>
+      <% include ejs/curve %>
       <div id="wrap" class="container">
 
         <div class="row row-centered keret">
@@ -201,7 +202,7 @@
               <% if(Object.keys(completedUploads).length === teamCount){%>
                 <p class="other-color-success"><b>Everyone completed the upload!</b></p>
               <%} else {%>
-                <b><%=Object.keys(completedUploads)%></b>&nbsp<a href="ftp://ftp.25.hu" target="_blank">See here</a>
+                <b><%=Object.keys(completedUploads)%></b>&nbsp
               <%} %>
             <%} %>
             <form class="form-inline" role="form" action="/clearList" method="post">

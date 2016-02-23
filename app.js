@@ -57,7 +57,9 @@ var Sensors = require(path.join(__dirname, './models/sensors.js'))(mongoose);
 
 var SensorBID = require(path.join(__dirname, './models/sensorbid.js'))(mongoose);
 
-var PriorityList = require(path.join(__dirname, './models/prioritylist.js'))(mongoose);
+var DesignerPriorityList = require(path.join(__dirname, './models/designerPrioritylist.js'))(mongoose);
+
+var TeamPriorityList = require(path.join(__dirname, './models/teamPrioritylist.js'))(mongoose);
 
 //assets
 require(path.join(__dirname, './routes/assets.js')).Assest(app);
@@ -67,10 +69,10 @@ require(path.join(__dirname, './auth.js'))(passport, LocalStrategy, Users);
 
 //routing in routes.js
 require(path.join(__dirname, './routes/login.js')).Login(app, passport);
-require(path.join(__dirname, './routes/designerbid.js')).DesignerBid(app, io, Teams, Designers, PriorityList, Users);
+require(path.join(__dirname, './routes/priorityList.js')).DesignerBid(app, io, Teams, Designers, DesignerPriorityList, TeamPriorityList, Users);
 require(path.join(__dirname, './routes/sensorbid.js')).SensorBid(app, io, Teams, SensorBID, Users);
-require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, PriorityList, Designers, SensorBID, Users);
-require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers, Sensors, PriorityList, SensorBID, Users);
+require(path.join(__dirname, './routes/profile.js')).Profile(app, io, Teams, DesignerPriorityList, TeamPriorityList, Designers, SensorBID, Users);
+require(path.join(__dirname, './routes/admin.js')).Admin(app, Teams, io, Designers, Sensors, SensorBID, Users);
 require(path.join(__dirname, './routes/upload.js')).Upload(app, Teams, ftpupload, Users, busboy);
 
 

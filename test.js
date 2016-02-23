@@ -18,7 +18,22 @@ Teams.count({
   }
 });
 
-var admin = require('./routes/admin.js');
+var priorityList = require('./routes/priorityList.js');
 var Designers = require('./models/designer.js')(mongoose);
-var PriorityList = require('./models/prioritylist.js')(mongoose);
-admin.setPriorityListRoundFinished(true,Teams, Designers, PriorityList);
+var DesignerPriorityList = require('./models/designerPrioritylist.js')(mongoose);
+var TeamPriorityList = require('./models/teamPrioritylist.js')(mongoose);
+DesignerPriorityList.find({}).select({
+  designerName: 1,
+  list: 1,
+  _id:0
+}).exec(function(err, designerPrioritylists) {
+  console.log(designerPrioritylists);
+  TeamPriorityList.find({}).select({
+    teamName: 1,
+    list: 1,
+    _id:0
+  }).exec(function(err, teamPrioritylists) {
+    console.log(teamPrioritylists);
+    priorityList.handlePriorityListRoundFinished(Teams, Designers, designerPrioritylists, teamPrioritylists);
+  });
+});

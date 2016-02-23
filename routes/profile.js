@@ -7,7 +7,7 @@ var writeHead = require('./utils.js').writeHead;
 var isAuthenticated = require('./login.js').isAuthenticated;
 
 
-var Profile = function(app, io, Teams, PriorityList, Designers, SensorBID, Users) {
+var Profile = function(app, io, Teams, DesignerPriorityList, TeamPriorityList, Designers, SensorBID, Users) {
 
     app.get('/', isAuthenticated, function(req, res, next) {
         res.redirect('/results');
@@ -19,35 +19,48 @@ var Profile = function(app, io, Teams, PriorityList, Designers, SensorBID, Users
         }, function(error, user) {
             writeHead(res);
 
-            PriorityList.find().select({
+            DesignerPriorityList.find().select({
                 '_id': 0,
                 'designerName': 1,
                 'list': 1
             }).exec(
-                function(err, priorityLists) {
-                    SensorBID.find().exec(function(err, sensorBids) {
-                        Designers.find().exec(function(err, designers) {
+                function(err, designerPrioritylists) {
+                    TeamPriorityList.find().select({
+                        '_id': 0,
+                        'teamName': 1,
+                        'list': 1
+                    }).exec(
+                        function(err, teamPrioritylists) {
+                            SensorBID.find().exec(function(err, sensorBids) {
+                                Designers.find().exec(function(err, designers) {
+                                    Teams.find().exec(function(err, teams) {
 
-                            var currentPriorityList = [];
-                            // Ha mindenki leadta a listajat vagy, ha admin vagyok
-                            if (priorityLists.length === designers.length || user.role == "admin") {
-                                currentPriorityList = sortPriorityList(priorityLists);
-                            }
+                                        var currentDesignerPriorityList = [];
+                                        var currentTeamPriorityList = [];
+                                        // Ha mindenki leadta a listajat vagy, ha admin vagyok
+                                        if ((designerPrioritylists && teamPrioritylists) && ((designerPrioritylists.length === designers.length && teamPrioritylists.length === teams.length) || user.role == "admin")) {
+                                            currentDesignerPriorityList = sortPriorityList(designerPrioritylists);
+                                            currentTeamPriorityList = sortPriorityList(teamPrioritylists);
+                                        }
 
-                            Teams.find().exec(function(err, teams) {
-                                res.render('results', {
-                                    username: user.name,
-                                    priorityLists: currentPriorityList,
-                                    sensorbids: sensorBids,
-                                    designerResult: designers,
-                                    teamResult: teams,
-                                    path: "/results",
-                                    role: user.role
+                                        Teams.find().exec(function(err, teams) {
+                                            res.render('results', {
+                                                username: user.name,
+                                                designerPriorityLists: currentDesignerPriorityList,
+                                                teamPriorityLists: currentTeamPriorityList,
+                                                sensorbids: sensorBids,
+                                                designerResult: designers,
+                                                teamResult: teams,
+                                                path: "/results",
+                                                role: user.role
+                                            });
+                                        });
+
+                                    });
                                 });
                             });
-
-                        });
-                    });
+                        }
+                    );
                 }
             );
         });
@@ -84,6 +97,21 @@ var compareBids = function(bid1, bid2) {
     return 0;
 };
 
+var sortMergedPriorityList = function(mergedPriorityList) {
+    return mergedPriorityList.sort(compareMergedPriorityList);
+};
+
+var compareMergedPriorityList = function(mergedPriorityList1, mergedPriorityList2) {
+    if(mergedPriorityList1.designerBidValue + mergedPriorityList1.teamBidValue > mergedPriorityList2.designerBidValue + mergedPriorityList2.teamBidValue) {
+        return -1;
+    }
+    if(mergedPriorityList1.designerBidValue + mergedPriorityList1.teamBidValue < mergedPriorityList2.designerBidValue + mergedPriorityList2.teamBidValue) {
+        return 1;
+    }
+
+    return 0;
+};
+
 exports.sortPriorityList = sortPriorityList;
-exports.compareBids = compareBids;
+exports.sortMergedPriorityList = sortMergedPriorityList;
 exports.Profile = Profile;

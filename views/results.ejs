@@ -15,7 +15,7 @@
     <!-- Request came from team-->
   <% } else { %>
     <% include ejs/teamMenu %>
-  <%} %>
+  <% } %>
 
   <!-- Main jumbotron for a primary marketing message or call to action -->
   <div class="jumbotron other-color">
@@ -25,11 +25,11 @@
   </div>
   <% include ejs/curve %>
 
-  <!-- Result of  priorityLists-->
+  <!-- Result of designer priorityLists-->
   <div class="container">
-    <h2>Priority lists:</h2>
-    <div id="priorityList">
-      <% if (priorityLists) { %>
+    <h2>Designer priority lists:</h2>
+    <div id="designerPriorityLists">
+      <% if (designerPriorityLists) { %>
       <span>
         <table class="table table-bordered table-hover" style="width:100%">
           <tr>
@@ -37,11 +37,11 @@
             <!--colspan="12" number of designer -->
             <th colspan="12">Priority list</th>
           </tr>
-          <% priorityLists.forEach(function(priorityList){ %>
+          <% designerPriorityLists.forEach(function(designerPriorityList) { %>
           <tr>
-            <td><%= priorityList.designerName %></td>
+            <td><%= designerPriorityList.designerName %></td>
 
-            <% priorityList.list.forEach(function(list){ %>
+            <% designerPriorityList.list.forEach(function(list){ %>
             <td><%=list.team %>: <%=list.value %></td>
             <% }); %>
 
@@ -49,6 +49,38 @@
           <% }); %>
         </table>
       </span>
+      <% } else { %>
+        <div>The priority list round is not finished yet!</div>
+      <% } %>
+    </div>
+  </div>
+
+    <!-- Result of team priorityLists-->
+  <div class="container">
+    <h2>Team priority lists:</h2>
+    <div id="teamPriorityLists">
+      <% if (teamPriorityLists) { %>
+      <span>
+        <table class="table table-bordered table-hover" style="width:100%">
+          <tr>
+            <th>Team</th>
+            <!--colspan="12" number of designer -->
+            <th colspan="12">Priority list</th>
+          </tr>
+          <% teamPriorityLists.forEach(function(teamPriorityList){ %>
+          <tr>
+            <td><%= teamPriorityList.teamName %></td>
+
+            <% teamPriorityList.list.forEach(function(list){ %>
+            <td><%=list.designer %>: <%=list.value %></td>
+            <% }); %>
+
+          </tr>
+          <% }); %>
+        </table>
+      </span>
+      <% } else { %>
+        <div>The priority list round is not finished yet!</div>
       <% } %>
     </div>
   </div>
@@ -91,17 +123,15 @@
         <table class="table table-bordered table-hover" style="width:100%">
           <tr>
             <th>Designer</th>
-            <th>Max bid</th>
-            <th>Avarage bid</th>
+            <th>Money</th>
             <th>Designer vote average</th>
             <th>Application vote average</th>
             <th>Sum</th>
           </tr>
-          <% designerResult.forEach(function(designer){ var sum = Math.round(designer.maxBid * 0.2) + Math.round(designer.avrgBid * 0.4) + designer.designerVote * 30 + designer.appVote * 30;%>
+          <% designerResult.forEach(function(designer){ var sum = Math.round(designer.money * 1/3) + designer.designerVote * 30 + designer.appVote * 30;%>
           <tr>
             <td><%= designer.name %></td>
-            <td><%= designer.maxBid %></td>
-            <td><%= designer.avrgBid%></td>
+            <td><%= designer.money %></td>
             <td><%= designer.designerVote %></td>
             <td><%= designer.appVote%></td>
             <td><%= sum %></td>
@@ -123,7 +153,6 @@
         <table class="table table-bordered table-hover" style="width:100%">
           <tr>
             <th>Team</th>
-            <th>Brought result</th>
             <th>Money</th>
             <th>Designer</th>
             <th>Team vote average</th>
@@ -133,7 +162,6 @@
           <% teamResult.forEach(function(team){ var sum = Math.round(team.money * 1/3) + team.teamVote * 30 + team.appVote * 30;%>
           <tr>
             <td><%= team.TeamFullName %></td>
-            <td><%= team.broughtResult %></td>
             <td><%= team.money %></td>
             <% if (team.designer) { %>
             <td><%= team.designer %></td>

@@ -16,11 +16,18 @@
   <!-- Request came for /results-->
   <% if (path === "/results") { %>
     <li class="active"><a id="username" href="/results"><%= username %></a></li>
-    <li><a href="/designer">Designer</a></li>
-  <!-- Request came for /designer-->
+    <li><a href="/priorityList">Priority list</a></li>
+    <li><a href="/upload">Upload</a></li>
+  <!-- Request came for /priorityList-->
+  <% } else if(path === "/priorityList"){ %>
+    <li><a id="username" href="/results"><%= username %></a></li>
+    <li class="active"><a href="/priorityList">Priority list</a></li>
+    <li><a href="/upload">Upload</a></li>
+  <!-- Request came for /upload-->
   <% } else { %>
     <li><a id="username" href="/results"><%= username %></a></li>
-    <li class="active"><a href="/designer">Designer</a></li>
+    <li><a href="/priorityList">Priority list</a></li>
+    <li class="active"><a href="/upload">Upload</a></li>
   <%} %>
   <li><a href="/logout">Logout</a></li>
   </ul>

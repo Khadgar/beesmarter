@@ -2,18 +2,18 @@ var mongoose = require('mongoose');
 
 module.exports = function(mongoose) {
     var Schema = mongoose.Schema;
-    var PriorityList = new Schema({
-        designerName: String,
+    var TeamPriorityList = new Schema({
+        teamName: String,
         createdAt: Date,
         list: [{
-            team: String,
+            designer: String,
             value: Number
         }]
     }, {
-        collection: 'PriorityList'
+        collection: 'TeamPriorityList'
     });
 
-    var model = mongoose.model('PriorityList', PriorityList);
+    var model = mongoose.model('TeamPriorityList', TeamPriorityList);
 
     return model;
 };

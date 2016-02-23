@@ -18,11 +18,10 @@ var maxBidValue,
 var interval_id,
     timeout_id;
 
-var bidSubject,
-    priorityListLeader;
+var bidSubject;
 
 
-var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, SensorBID, Users) {
+var Admin = function(app, Teams, io, Designers, Sensors, SensorBID, Users) {
     app.get('/admin', isAuthenticated, function(req, res, next) {
         var completedUploads = require('./upload.js').completedUploads;
         process.nextTick(function() {
@@ -32,31 +31,22 @@ var Admin = function(app, Teams, io, Designers, Sensors, PriorityList, SensorBID
                 writeHead(res);
                 if (user.role === "admin") {
                     Sensors.find().exec(function(err, sensors) {
-                        PriorityList.find()
-                            .exec(function(err, priorityLists) {
-                                Teams.find({}, function(err, teams) {
-                                    Designers.find({}, function(err, designers) {
-                                        var message = "";
-                                        if (priorityLists.length === 0) {
-                                            message = "The priority lists are empty.";
-                                        } else if(priorityLists.length !== designers.length) {
-                                            message = "Not all the designers have a priority list yet.";
-                                        }
-                                        res.render('admin', {
-                                            username: user.name,
-                                            sensors: sensors,
-                                            completedUploads: completedUploads,
-                                            teamCount: teams.length,
-                                            teams: teams,
-                                            designers: designers,
-                                            canUpload: canUpload,
-                                            path: "/admin",
-                                            message: message
-                                        });
+                        Teams.find({}, function(err, teams) {
+                            Designers.find({}, function(err, designers) {
 
-                                    });
+                                res.render('admin', {
+                                    username: user.name,
+                                    sensors: sensors,
+                                    completedUploads: completedUploads,
+                                    teamCount: teams.length,
+                                    teams: teams,
+                                    designers: designers,
+                                    canUpload: canUpload,
+                                    path: "/admin"
                                 });
+
                             });
+                        });
                     });
 
                 } else {
@@ -237,7 +227,6 @@ var endAuction = function() {
     stepTime = undefined;
     step = undefined;
     bidSubject = undefined;
-    priorityListLeader = undefined;
 };
 
 var getBidSubject = function() {

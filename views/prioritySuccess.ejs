@@ -6,7 +6,13 @@
 </head>
 
 <body class= "allbgcolor">
-  <% include ejs/designerMenu %>
+  <!-- Request came from designer-->
+  <% if (role === "designer") { %>
+    <% include ejs/designerMenu %>
+    <!-- Request came from team-->
+  <% } else { %>
+    <% include ejs/teamMenu %>
+  <%} %>
   <div class="jumbotron other-color">
     <div class="container">
       <h1>You have successfully submitted your priority list</h1>

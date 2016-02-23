@@ -5,7 +5,6 @@ module.exports = function(mongoose) {
 	var Team = new Schema({
 		TeamID: String,
 		TeamFullName: String,
-		broughtResult: Number,
 		money: Number,
 		designer: String,
 		teamVote: Number,

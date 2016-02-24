@@ -8,7 +8,6 @@
     var socket = io();
     socket.on('priorityListRoundFinished', function() {
       $('#messages').html("All the priority lists have been added!");
-      document.getElementById("startDesignerAuctionBTN").disabled = false;
       socket.removeAllListeners('priorityListRoundFinished');
     });
     socket.on('BIDSensorsuccess', function(data) {
@@ -44,7 +43,6 @@
         <div class="container">
           <h1>Messages</h1>
           <div id="messages">&nbsp</div>
-          <div> <%- message %> </div>
         </div>
       </div>
       <% include ejs/curve %>
@@ -237,6 +235,14 @@
                     <td>
                       <div class="form-group">
                         <input type="string" placeholder="Full name" class="form-control" name="fullName" required>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Money:</td>
+                    <td>
+                      <div class="form-group">
+                        <input type="number" placeholder="Money" class="form-control" name="money" required>
                       </div>
                     </td>
                   </tr>

@@ -168,6 +168,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, SensorBID, Users) {
     app.post('/addUser', isAuthenticated, function(req, res, next) {
         var ID = req.body.ID;
         var name = req.body.fullName;
+        var money = req.body.money;
 
         var newUser = {
             ID: ID,
@@ -181,7 +182,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, SensorBID, Users) {
             var newTeam = {
                 TeamID: ID,
                 TeamFullName: name,
-                money: 1000,
+                money: money,
                 designer: null,
                 teamVote: null,
                 appVote: null
@@ -193,7 +194,7 @@ var Admin = function(app, Teams, io, Designers, Sensors, SensorBID, Users) {
             var newDesigner = {
                 DesginerID: ID,
                 name: name,
-                money: 1000,
+                money: money,
                 designerVote: null,
                 appVote: null
             };

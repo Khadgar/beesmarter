@@ -45,13 +45,13 @@
     <% include ejs/teamMenu %>
       <div class="jumbotron other-color">
         <div class="container">
-          <h1>Sensor bid</h1>
+          <h1>Auction</h1>
         </div>
       </div>
     <% include ejs/curve %>
-	  <div id="wrap" class="container">
-      <table class="table table-bordered table-hover" style="width:100%">
-        <tr><th>Sensor</th><th>Minimal Value</th></tr>
+	  <div id="wrap" class="container teamresult">
+      <table class="table table-bordered sensortable">
+        <tr><th>Part</th><th>Minimal Value</th></tr>
         <tr><td><div id="currentSensorName">&nbsp</div></td>
         <td><div id="currentSensorValue">&nbsp</div></td></tr>
       </table>
@@ -59,7 +59,7 @@
         <p>Current bid value:</p>
         <div id="counter">&nbsp</div>
       </h3>
-      <button id= "submitSensorBTN" class="btn btn-success" disabled>BID</button>
+      <button id= "submitSensorBTN" class="btn btn-success largebtn" disabled>BID</button>
       </br>
       <h3><p id="bidstate">&nbsp</p></h3>
 	  </div>

@@ -3,280 +3,263 @@
   <head>
     <% include ejs/head %>
   </head>
-
   <script>
-    var socket = io();
-    socket.on('priorityListRoundFinished', function() {
+  var socket = io();
+  socket.on('priorityListRoundFinished', function() {
       $('#messages').html("All the priority lists have been added!");
       socket.removeAllListeners('priorityListRoundFinished');
-    });
-    socket.on('BIDSensorsuccess', function(data) {
+  });
+  socket.on('BIDSensorsuccess', function(data) {
       $('#messages').html(data.msg);
       socket.removeAllListeners('BIDSensorsuccess');
-    });
+  });
 
-    function validateNumberInput(event) {
+  function validateNumberInput(event) {
       var charCode = event.charCode;
       return (charCode >= 48 && charCode <= 57) || charCode === 0;
-    }
+  }
 
-    function validateDoubleInput(event) {
+  function validateDoubleInput(event) {
       var charCode = event.charCode;
       return (charCode >= 48 && charCode <= 57) || charCode === 0 || charCode === 46;
-    }
+  }
 
-    function validateForm() {
+  function validateForm() {
       var sensorBidForm = document.forms.sensorBidForm;
-
       if (parseInt(sensorBidForm[0].value) <= parseInt(sensorBidForm[1].value)) {
-        alert("The maximum value has to be bigger, than the minimum value!");
-        return false;
+          alert("The maximum value has to be bigger, than the minimum value!");
+          return false;
       }
-    }
-
+  }
   </script>
-
   <body class= "allbgcolor">
     <% include ejs/adminMenu %>
-
-      <div class="jumbotron other-color">
-        <div class="container">
-          <h1>Messages</h1>
-          <div id="messages">&nbsp</div>
-        </div>
+    <div class="jumbotron other-color">
+      <div class="container">
+        <h1>Messages</h1>
+        <div id="messages">&nbsp</div>
       </div>
-      <% include ejs/curve %>
-      <div id="wrap" class="container">
-
-        <div class="row row-centered keret">
-
-          <div class="row row-centered">
-            <div class="col-xs-6 col-centered col-max">
-              <h3 class="sub-header other-color">Sensors</h3>
-              <form class="form-inline" name="sensorBidForm" role="form" action="/startSensorAuction" method="post" onsubmit="return validateForm()">
-                <table style="width:100%">
-                  <tr>
-                    <td>Max Value:</td><td><div class="form-group"><input type="number" min="0" max="1000" onkeypress="return validateNumberInput(event)" placeholder="Max Value" class="form-control" name="maxValue" required></div></td>
-                  </tr>
-                  <tr>
-                    <td>Min Value:</td><td><div class="form-group"><input type="number" min="0" max="1000" onkeypress="return validateNumberInput(event)" placeholder="Min Value" class="form-control" name="minValue" required></div></td>
-                  </tr>
+    </div>
+    <% include ejs/curve %>
+    <div id="wrap" class="container">
+      <div class="row keret"> <!-- Main Frame start -->
+        <div class="row"> <!-- First row -->
+          <div class="col-lg-6 col-xs-12"> <!-- 1/1 Auction-->
+            <h3 class="sub-header other-color">Auction</h3>
+            <form name="sensorBidForm" role="form" action="/startSensorAuction" method="post" onsubmit="return validateForm()">
+              <table class="admintable">
+                <tr>
+                  <td>Max Value:</td><td><div class="form-group"><input type="number" min="0" max="1000" onkeypress="return validateNumberInput(event)" placeholder="Max Value" class="form-control" name="maxValue" required></div></td>
+                </tr>
+                <tr>
+                  <td>Min Value:</td><td><div class="form-group"><input type="number" min="0" max="1000" onkeypress="return validateNumberInput(event)" placeholder="Min Value" class="form-control" name="minValue" required></div></td>
                 </tr>
                 <tr>
                   <td>Step time(seconds):</td><td><div class="form-group"><input type="number" min= "0.1" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Step time(seconds)" class="form-control" name="stepTime" required></div></td>
                 </tr>
               </table>
-              <div id="sensorWrapper">
+              <div id="sensorWrapper" class="wrapper">
                 <% if (sensors) { %>
                 <span>
-                <% sensors.forEach(function(sensor){ var quoteName='"'+sensor.name+'"';%>
-                <div class="radio">
-                  <label><%= sensor.name %> <input type="radio" name="optradio" value=<%- quoteName %> required></label>
-                </div>
-                <br>
-                <% }); %>
+                  <% sensors.forEach(function(sensor){ var quoteName='"'+sensor.name+'"';%>
+                  <div class="radio">
+                    <label><input type="radio" name="optradio" value=<%- quoteName %> required> <%= sensor.name %>
+                    </label>
+                  </div>
+                  
+                  <% }); %>
                 </span>
                 <% } %>
               </div>
-              <button type="submit" class="btn btn-success">Start Sensor Auction</button>
+              <button type="submit" class="btn btn-success">Start Auction</button>
             </form>
           </div>
-        </div>
-
-        <div class="row row-centered">
-          <div class="col-xs-6 col-centered col-max">
-              <h3 class="sub-header other-color">Team votes</h3>
-              <form class="form-inline" role="form" action="/teamVote" method="post">
-                <table style="width:100%">
-                  <tr>
-                    <td>Average vote:</td>
-                    <td>
-                      <div class="form-group">
-                        <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
-                      </div>
-                    </td>
-                  </tr>
+          <div class="col-lg-6 col-xs-12"> <!-- 1/2 Team votes-->
+            <h3 class="sub-header other-color">Team votes</h3>
+            <form role="form" action="/teamVote" method="post">
+              <table class="admintable">
+                <tr>
+                  <td>Average vote:</td>
+                  <td>
+                    <div class="form-group">
+                      <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
+                    </div>
+                  </td>
                 </tr>
-              </table>
-              <div id="teamWrapper">
-                <span>
+            </table>
+            <div id="teamWrapper" class="wrapper">
+              <span>
                 <% teams.forEach(function(team){ var quoteName='"'+team.TeamFullName+'"';%>
                 <div class="radio">
-                  <label><%= team.TeamFullName %>
-                    <input type="radio" name="optradio" value=<%- quoteName %> required>
+                  <label>
+                    <input type="radio" name="optradio" value=<%- quoteName %> required><%= team.TeamFullName %>
                   </label>
                 </div>
-                <br>
                 <% }); %>
-                </span>
-              </div>
-              <button type="submit" class="btn btn-success">Submit team vote</button>
-            </form>
-          </div>
+              </span>
+            </div>
+            <button type="submit" class="btn btn-success">Submit team vote</button>
+          </form>
+        </div>
+      </div>
 
-          <div class="col-xs-6 col-centered col-max">
-              <h3 class="sub-header other-color">Designer votes</h3>
-              <form class="form-inline" role="form" action="/designerVote" method="post">
-                <table style="width:100%">
-                  <tr>
-                    <td>Average vote:</td>
-                    <td>
-                      <div class="form-group">
-                        <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
-                      </div>
-                    </td>
-                  </tr>
-                </tr>
-              </table>
-              <div id="designerWrapper">
-                <span>
+      <div class="row"> <!-- Second Row -->
+        <div class="col-lg-6 col-xs-12"> <!-- 2/1 Designer Vote -->
+          <h3 class="sub-header other-color">Designer votes</h3>
+          <form role="form" action="/designerVote" method="post">
+            <table class="admintable">
+              <tr>
+                <td>Average vote:</td>
+                <td>
+                  <div class="form-group">
+                    <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
+                  </div>
+                </td>
+              </tr>
+            </table>
+            <div id="designerWrapper" class="wrapper">
+              <span>
                 <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
                 <div class="radio">
-                  <label><%= designer.name %>
-                    <input type="radio" name="optradio" value=<%- quoteName %> required>
+                  <label>
+                    <input type="radio" name="optradio" value=<%- quoteName %> required><%= designer.name %>
                   </label>
                 </div>
-                <br>
                 <% }); %>
-                </span>
-              </div>
-              <button type="submit" class="btn btn-success">Submit designer vote</button>
-            </form>
-          </div>
-
-          <div class="col-xs-6 col-centered col-max">
-              <h3 class="sub-header other-color">Application votes</h3>
-              <form class="form-inline" role="form" action="/applicationVote" method="post">
-                <table style="width:100%">
-                  <tr>
-                    <td>Average vote:</td>
-                    <td>
-                      <div class="form-group">
-                        <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
-                      </div>
-                    </td>
-                  </tr>
-                </tr>
-              </table>
-              <div id="teamWrapper">
-                <span>
-                <% teams.forEach(function(team){ var quoteName='"'+team.TeamFullName+'"';%>
-                <div class="radio">
-                  <label><%= team.TeamFullName %>
-                    <input type="radio" name="optradio" value=<%- quoteName %> required>
-                  </label>
-                </div>
-                <br>
-                <% }); %>
-                </span>
-              </div>
-              <button type="submit" class="btn btn-success">Submit application vote</button>
-            </form>
-          </div>
-
+              </span>
+            </div>
+            <button type="submit" class="btn btn-success">Submit designer vote</button>
+          </form>
         </div>
-
-
-        <div class="row row-centered">
-          <div class="col-xs-6 col-centered col-max">
-            <h3 class="sub-header other-color">START Upload</h3>
-            <form class="form-inline" role="form" action="/startUpload" method="post">
-              <button type="submit" id="startUploadButton" class="btn btn-success"<% if (canUpload) { %> disabled <% } %> >START Upload</button>
-            </form>
-          </div>
-          <div class="col-xs-6 col-centered col-max">
-            <h3 class="sub-header other-color">STOP Upload</h3>
-            <form class="form-inline" role="form" action="/stopUpload" method="post">
-              <button type="submit" id="stopUploadButton"class="btn btn-danger" <% if (!canUpload) { %> disabled <% } %>>STOP Upload</button>
-            </form>
-          </div>
-        </div>
-
-        <div class="row row-centered">
-          <div class="col-xs-6 col-centered col-max">
-            <h3 class="sub-header other-color">Uploaded by</h3>
-            <p id="completedUploads"></p>
-            <% if(completedUploads){%>
-              <% if(Object.keys(completedUploads).length === teamCount){%>
-                <p class="other-color-success"><b>Everyone completed the upload!</b></p>
-              <%} else {%>
-                <b><%=Object.keys(completedUploads)%></b>&nbsp
-              <%} %>
-            <%} %>
-            <form class="form-inline" role="form" action="/clearList" method="post">
-              <button type="submit" class="btn btn-danger btn-xs">Clear</button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Add new user -->
-        <div class="col-xs-6 col-centered col-max">
-              <h3 class="sub-header other-color">Add new user</h3>
-              <form class="form-inline" role="form" action="/addUser" method="post">
-                <table style="width:100%">
-                  <tr>
-                    <td>ID:</td>
-                    <td>
-                      <div class="form-group">
-                        <input type="string" placeholder="ID" class="form-control" name="ID" required>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Password:</td>
-                    <td>
-                      <div class="form-group">
-                        <input type="string" placeholder="Password" class="form-control" name="password" required>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Full Name:</td>
-                    <td>
-                      <div class="form-group">
-                        <input type="string" placeholder="Full name" class="form-control" name="fullName" required>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>Money:</td>
-                    <td>
-                      <div class="form-group">
-                        <input type="number" placeholder="Money" class="form-control" name="money" required>
-                      </div>
-                    </td>
-                  </tr>
-              </table>
-              <div id="teamWrapper">
-                <span>
-                <div class="radio">
-                  <label>Team
-                    <input type="radio" name="roleradio" value="team" required>
-                  </label>
-                </div>
-                <br>
-                <div class="radio">
-                  <label>Designer
-                    <input type="radio" name="roleradio" value="designer" required>
-                  </label>
-                </div>
-                <br>
-                </span>
+        
+        <div class="col-lg-6 col-xs-12"> <!-- 2/2 Application Vote -->
+          <h3 class="sub-header other-color">Application votes</h3>
+          <form role="form" action="/applicationVote" method="post">
+            <table class="admintable">
+              <tr>
+                <td>Average vote:</td>
+                <td>
+                  <div class="form-group">
+                    <input type="number" min="0" max="10" step="0.1" onkeypress="return validateDoubleInput(event)" placeholder="Average vote" class="form-control" name="averageVote" required>
+                  </div>
+                </td>
+              </tr>
+          </table>
+          <div id="teamWrapper" class="wrapper">
+            <span>
+              <% teams.forEach(function(team){ var quoteName='"'+team.TeamFullName+'"';%>
+              <div class="radio">
+                <label>
+                  <input type="radio" name="optradio" value=<%- quoteName %> required> <%= team.TeamFullName %>
+                </label>
               </div>
-              <button type="submit" class="btn btn-success">Add new user</button>
-            </form>
+              <% }); %>
+            </span>
           </div>
+          <button type="submit" class="btn btn-success">Submit application vote</button>
+        </form>
+        </div>
+      </div>
 
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <h3 class="sub-header other-color">START Upload</h3>
+        <form class="form-inline" role="form" action="/startUpload" method="post">
+          <button type="submit" id="startUploadButton" class="btn btn-success"<% if (canUpload) { %> disabled <% } %> >START Upload</button>
+        </form>
+      </div>
 
+      <div class="col-lg-6 col-xs-12">
+        <h3 class="sub-header other-color">STOP Upload</h3>
+        <form class="form-inline" role="form" action="/stopUpload" method="post">
+          <button type="submit" id="stopUploadButton"class="btn btn-danger" <% if (!canUpload) { %> disabled <% } %>>STOP Upload</button>
+        </form>
       </div>
     </div>
+    
+    <div class="row">
+      <div class="col-lg-6 col-xs-12">
+        <h3 class="sub-header other-color">Uploaded by</h3>
+        <p id="completedUploads"></p>
+        <% if(completedUploads){%>
+        <% if(Object.keys(completedUploads).length === teamCount){%>
+        <p class="other-color-success"><b>Everyone completed the upload!</b></p>
+        <%} else {%>
+        <b><%=Object.keys(completedUploads)%></b>&nbsp
+        <%} %>
+        <%} %>
+        <form class="form-inline" role="form" action="/clearList" method="post">
+          <button type="submit" class="btn btn-danger btn-xs">Clear</button>
+        </form>
+      </div>
+      <!-- Add new user -->
+      <div class="col-lg-6 col-xs-12">
+      <h3 class="sub-header other-color">Add new user</h3>
+      <form role="form" action="/addUser" method="post">
+        <table class="admintable">
+          <tr>
+            <td>ID:</td>
+            <td>
+              <div class="form-group">
+                <input type="string" placeholder="ID" class="form-control" name="ID" required>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Password:</td>
+            <td>
+              <div class="form-group">
+                <input type="string" placeholder="Password" class="form-control" name="password" required>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Full Name:</td>
+            <td>
+              <div class="form-group">
+                <input type="string" placeholder="Full name" class="form-control" name="fullName" required>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Money:</td>
+            <td>
+              <div class="form-group">
+                <input type="number" placeholder="Money" class="form-control" name="money" required>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <div id="teamWrapper" class="wrapper">
+          <span>
+            <div class="radio">
+              <label>
+                <input type="radio" name="roleradio" value="team" required>Team
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input type="radio" name="roleradio" value="designer" required>Designer
+              </label>
+            </div>
+            <br>
+          </span>
+        </div>
+        <button type="submit" class="btn btn-success">Add new user</button>
+      </form>
+    </div>
+    </div>
+    
+    
   </div>
-  <br>
-  <br><br>
-  <br>
-	  <!-- Site footer -->
-		<footer class="footer">
-    <% include ejs/footer %>
-		</footer>
+</div>
+</div>
+<br>
+<br><br>
+<br>
+<!-- Site footer -->
+<footer class="footer">
+<% include ejs/footer %>
+</footer>
 </body>
 </html>

@@ -17,17 +17,17 @@
           <% if (path === "/results") { %>
             <li class="active"><a id="username" href="/results"><%= username %></a></li>
             <li><a href="/priorityList">Priority list</a></li>
-            <li><a href="/sensor">Sensor</a></li>
+            <li><a href="/sensor">Auction</a></li>
           <!-- Request came for /priorityList-->
           <% } else if(path === "/priorityList"){ %>
             <li><a id="username" href="/results"><%= username %></a></li>
             <li class="active"><a href="/priorityList">Priority list</a></li>
-            <li><a href="/sensor">Sensor</a></li>
+            <li><a href="/sensor">Auction</a></li>
           <!-- Request came for /sensor-->
           <% } else { %>
             <li><a id="username" href="/results"><%= username %></a></li>
             <li><a href="/priorityList">Priority list</a></li>
-            <li class="active"><a href="/sensor">Sensor</a></li>
+            <li class="active"><a href="/sensor">Auction</a></li>
           <% } %>
           <li><a href="/logout">Logout</a></li>
         </ul>

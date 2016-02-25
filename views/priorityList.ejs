@@ -13,17 +13,26 @@
     var priorityListForm = document.forms.priorityListForm;
 
     var uniqueValues = true;
+    var sum = priorityListForm[0].value;
     for (var j = 0; j < priorityListForm.length - 1; j++) {
         //Check for duplicates
         if (priorityListForm[j + 1].value === priorityListForm[j].value) {
           uniqueValues = false;
         }
+        sum += priorityListForm[j + 1].value;
       }
       if(uniqueValues) {
         $('#submitbtn').attr('disabled',true);
       }
       else {
         alert("The values have to be unique");
+        return false;
+      }
+
+      if(sum === 1000) {
+        $('#submitbtn').attr('disabled',true);
+      } else {
+        alert("The sum of the values has to be 1000");
         return false;
       }
     }
@@ -55,7 +64,7 @@
         <br>
         <% teams.forEach(function(team){ var quoteName='"'+team.TeamFullName+'"';%>
         <div class="form-group">
-          <label><%= team.TeamFullName %> <input type="number" min="5" max="500" step="5" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
+          <label><%= team.TeamFullName %> <input type="number" min="10" max="1000" step="10" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
         </div>
         <br>
         <% }); %>
@@ -70,7 +79,7 @@
         <br>
         <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
         <div class="form-group">
-          <label><%= designer.name %> <input type="number" min="5" max="500" step="5" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
+          <label><%= designer.name %> <input type="number" min="10" max="1000" step="10" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
         </div>
         <br>
         <% }); %>

@@ -43,14 +43,17 @@ var Profile = function(app, io, Teams, DesignerPriorityList, TeamPriorityList, D
                                             currentTeamPriorityList = sortPriorityList(teamPrioritylists);
                                         }
 
+                                        teamsSummed = sortTeams(teams);
+                                        designersSummed = sortDesigners(designers);
+
                                         Teams.find().exec(function(err, teams) {
                                             res.render('results', {
                                                 username: user.name,
                                                 designerPriorityLists: currentDesignerPriorityList,
                                                 teamPriorityLists: currentTeamPriorityList,
                                                 sensorbids: sensorBids,
-                                                designerResult: designers,
-                                                teamResult: teams,
+                                                designerResult: designersSummed,
+                                                teamResult: teamsSummed,
                                                 path: "/results",
                                                 role: user.role
                                             });
@@ -65,6 +68,38 @@ var Profile = function(app, io, Teams, DesignerPriorityList, TeamPriorityList, D
             );
         });
     });
+};
+
+var sortTeams = function(teams) {
+    summedTeams = teams.map(function(team) {
+        var sum = Math.round(team.money * 1/3) + team.teamVote * 30 + team.appVote * 30;
+        team.sum = sum;
+        return team;
+    });
+
+    return summedTeams.sort(compareSums);
+};
+
+
+var sortDesigners = function(designers) {
+    summedDesigners = designers.map(function(designer) {
+        var sum = Math.round(designer.money * 1/3) + designer.designerVote * 30 + designer.appVote * 30;
+        designer.sum = sum;
+        return designer;
+    });
+
+    return summedDesigners.sort(compareSums);
+};
+
+var compareSums = function(summedObject1, summedObject2) {
+     if (summedObject1.sum > summedObject2.sum) {
+        return -1;
+    }
+    if (summedObject1.sum < summedObject2.sum) {
+        return 1;
+    }
+
+    return 0;
 };
 
 

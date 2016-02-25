@@ -161,19 +161,25 @@ var checkPriorityList = function(req, role) {
                 value: req.body[key]
             });
         }
-
     }
 
-    //Le kell ellenorizni, minden field ki  5-nelnagyobb es 1000-nel kisebb,
-    //  illetve, hogy kulonbozo ertekuek-e es legalabb 5 a kulonbseg koztuk.
+    //Le kell ellenorizni, minden field ki  10-nel nagyobb es 1000-nel kisebb,
+    //  illetve, hogy kulonbozo ertekuek-e es legalabb 10 a kulonbseg koztuk.
+    // Hogy 10-zel osztható legyen és, hogy mind az 1000-t fölrakták-e
+    var sum = newList[0].value;
     for (var i = 0; i < newList.length - 1; i++) {
         var value = newList[i].value;
         var nextValue = newList[i + 1].value;
 
-        if ((value >= 5 && value <= 500) && (Math.abs(value - nextValue) >= 5)) {} else {
-            console.log('The values have to be >= 5, <= 500 and the differences have to be >= 5!');
+        if ((value >= 10 && value <= 1000) && (Math.abs(value - nextValue) >= 10) && value % 10 === 0) {} else {
+            console.log('The values have to be >= 10, <= 1000 and the differences have to be >= 10 and value mod 10 should be zero!');
             return res.redirect('/priorityList');
         }
+        sum += nextValue;
+    }
+    if (sum !== 1000) {
+        console.log('The values sum has to be 1000!');
+        return res.redirect('/priorityList');
     }
 
     return newList;

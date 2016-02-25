@@ -10,17 +10,13 @@ var getMinValue = require('./admin.js').getMinValue;
 var getBidSubject = require('./admin.js').getBidSubject;
 var endAuction = require('./admin.js').endAuction;
 
-Date.prototype.addHours = function(h) {
-    this.setHours(this.getHours() + h);
-    return this;
-};
 
 var getCurrentDate = function() {
     return new Date().toJSON().slice(0, 10);
 };
 
 var getCurrentTime = function() {
-    return new Date().addHours(1).toTimeString().slice(0, 8);
+    return new Date().toTimeString().slice(0, 8);
 };
 
 var getCurrentDateTime = function() {

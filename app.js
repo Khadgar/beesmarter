@@ -22,6 +22,8 @@ app.set('port', process.env.PORT || 3000);
 
 app.use(cookieParser('dandroid'));
 
+app.use(express.static('keys'));
+
 app.use(session({
   secret: 'cookie_secret',
     resave: true,

@@ -70,7 +70,7 @@ var Profile = function(app, io, Teams, DesignerPriorityList, TeamPriorityList, D
     });
 
     app.get('/getgitkey', isAuthenticated, function(req, res, next) {
-        var filename = req.user.ID + '_git.pub';
+        var filename = req.user.ID + '_git';
         res.redirect('/'+filename);
     });
 };

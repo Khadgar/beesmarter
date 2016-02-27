@@ -191,7 +191,6 @@ var handlePriorityListRoundFinished = function(Teams, Designers, designerPriorit
     // Ha minden designer leadta a prioritasi listajat, osszeparositjuk a designereket a team-ekkel
     // Mindenkit mindekivel parositva -> max ertek elso
     var prioNumberDesignerPriorityList = addPrioNumberToList(designerPrioritylists);
-    // console.log(prioNumberDesignerPriorityList[0].list);
     var prioNumberTeamPriorityList = addPrioNumberToList(teamPrioritylists);
     var mergedPriorityLists = mergePriorityLists(prioNumberDesignerPriorityList, prioNumberTeamPriorityList);
     var sortedMergedPrioritylists = sortMergedPriorityList(mergedPriorityLists);

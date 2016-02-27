@@ -77,7 +77,7 @@ var Profile = function(app, io, Teams, DesignerPriorityList, TeamPriorityList, D
 
 var sortTeams = function(teams) {
     summedTeams = teams.map(function(team) {
-        var sum = Math.round(team.money * 1/3) + team.teamVote * 30 + team.appVote * 30;
+        var sum = team.teamVote + team.appVote;
         team.sum = sum;
         return team;
     });
@@ -88,7 +88,7 @@ var sortTeams = function(teams) {
 
 var sortDesigners = function(designers) {
     summedDesigners = designers.map(function(designer) {
-        var sum = Math.round(designer.money * 1/3) + designer.designerVote * 30 + designer.appVote * 30;
+        var sum = designer.designerVote + designer.appVote;
         designer.sum = sum;
         return designer;
     });
@@ -148,6 +148,18 @@ var compareMergedPriorityList = function(mergedPriorityList1, mergedPriorityList
     if(mergedPriorityList1.designerBidValue + mergedPriorityList1.teamBidValue < mergedPriorityList2.designerBidValue + mergedPriorityList2.teamBidValue) {
         return 1;
     }
+    if(mergedPriorityList1.designerPrio < mergedPriorityList2.designerPrio) {
+        return -1;
+    }
+    if(mergedPriorityList1.designerPrio > mergedPriorityList2.designerPrio) {
+        return 1;
+    }
+    if(mergedPriorityList1.teamPrio < mergedPriorityList2.teamPrio) {
+        return -1;
+    }
+    if(mergedPriorityList1.teamPrio > mergedPriorityList2.teamPrio) {
+        return 1;
+    }
 
     return 0;
 };
@@ -155,3 +167,4 @@ var compareMergedPriorityList = function(mergedPriorityList1, mergedPriorityList
 exports.sortPriorityList = sortPriorityList;
 exports.sortMergedPriorityList = sortMergedPriorityList;
 exports.Profile = Profile;
+exports.compareBids = compareBids;

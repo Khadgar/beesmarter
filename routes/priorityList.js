@@ -8,6 +8,7 @@ var isAuthenticated = require('./login.js').isAuthenticated;
 
 var sortPriorityList = require('./profile.js').sortPriorityList;
 var sortMergedPriorityList = require('./profile.js').sortMergedPriorityList;
+var compareBids = require('./profile.js').compareBids;
 
 
 
@@ -82,7 +83,7 @@ var DesignerBid = function(app, io, Teams, Designers, DesignerPriorityList, Team
         }, function(error, user) {
 
             if (user.role === "designer") {
-                var newDesignerList = checkPriorityList(req, user.role);
+                var newDesignerList = checkPriorityList(req, res, user.role, 900);
 
                 var newDesignerPriorityList = {
                     designerName: user.name,
@@ -94,7 +95,7 @@ var DesignerBid = function(app, io, Teams, Designers, DesignerPriorityList, Team
                 var designerPrioritylist = new DesignerPriorityList(newDesignerPriorityList);
                 designerPrioritylist.save(function(err) {});
             } else {
-                var newTeamList = checkPriorityList(req, user.role);
+                var newTeamList = checkPriorityList(req, res, user.role, 600);
 
                 var newTeamPrioritylist = {
                     teamName: user.name,
@@ -137,7 +138,7 @@ var DesignerBid = function(app, io, Teams, Designers, DesignerPriorityList, Team
     });
 };
 
-var checkPriorityList = function(req, role) {
+var checkPriorityList = function(req, res, role, max) {
     var newList = [];
     for (var key in req.body) {
         //Le kell ellenorizni, hogy ki van-e toltve
@@ -165,11 +166,11 @@ var checkPriorityList = function(req, role) {
 
     //Le kell ellenorizni, minden field ki  10-nel nagyobb es 1000-nel kisebb,
     //  illetve, hogy kulonbozo ertekuek-e es legalabb 10 a kulonbseg koztuk.
-    // Hogy 10-zel osztható legyen és, hogy mind az 1000-t fölrakták-e
-    var sum = newList[0].value;
+    // Hogy 10-zel osztható legyen és, hogy mind az 600/900-at fölrakták-e
+    var sum = parseInt(newList[0].value, 10);
     for (var i = 0; i < newList.length - 1; i++) {
-        var value = newList[i].value;
-        var nextValue = newList[i + 1].value;
+        var value = parseInt(newList[i].value);
+        var nextValue = parseInt(newList[i + 1].value);
 
         if ((value >= 10 && value <= 1000) && (Math.abs(value - nextValue) >= 10) && value % 10 === 0) {} else {
             console.log('The values have to be >= 10, <= 1000 and the differences have to be >= 10 and value mod 10 should be zero!');
@@ -177,28 +178,42 @@ var checkPriorityList = function(req, role) {
         }
         sum += nextValue;
     }
-    if (sum !== 1000) {
-        console.log('The values sum has to be 1000!');
+    if (sum !== max) {
+        console.log('The values sum has to be 600/900! SUM: ' + sum + ", MAX: " + max);
         return res.redirect('/priorityList');
     }
 
     return newList;
-    // TODO check team with different values, add sum check
 };
 
 
 var handlePriorityListRoundFinished = function(Teams, Designers, designerPrioritylists, teamPrioritylists) {
     // Ha minden designer leadta a prioritasi listajat, osszeparositjuk a designereket a team-ekkel
     // Mindenkit mindekivel parositva -> max ertek elso
-    var mergedPriorityLists = mergePriorityLists(designerPrioritylists, teamPrioritylists);
+    var prioNumberDesignerPriorityList = addPrioNumberToList(designerPrioritylists);
+    // console.log(prioNumberDesignerPriorityList[0].list);
+    var prioNumberTeamPriorityList = addPrioNumberToList(teamPrioritylists);
+    var mergedPriorityLists = mergePriorityLists(prioNumberDesignerPriorityList, prioNumberTeamPriorityList);
     var sortedMergedPrioritylists = sortMergedPriorityList(mergedPriorityLists);
 
     var length = designerPrioritylists.length;
 
     for (var i = 0; i < length; i++) {
         var leader = sortedMergedPrioritylists[0];
+        console.log(leader);
         sortedMergedPrioritylists = updateWinner(leader, Teams, Designers, sortedMergedPrioritylists);
     }
+};
+
+var addPrioNumberToList = function(prioLists) {
+    return prioLists.map(function(prioList) {
+        var list = prioList.list.sort(compareBids);
+        for(var i = 0; i < list.length; i++) {
+            list[i].prio = i;
+        }
+        prioList.list = list;
+        return prioList;
+    });
 };
 
 var mergePriorityLists = function(designerPrioritylists, teamPrioritylists) {
@@ -216,7 +231,9 @@ var mergePriorityLists = function(designerPrioritylists, teamPrioritylists) {
                         designerName: designerPrioritylist.designerName,
                         teamName: teamPrioritylist.teamName,
                         designerBidValue: designerBid.value,
-                        teamBidValue: teamBid.value
+                        teamBidValue: teamBid.value,
+                        designerPrio: designerBid.prio,
+                        teamPrio: teamBid.prio
                     };
                     mergedPriorityLists.push(mergedPriorityList);
 
@@ -239,12 +256,12 @@ var updateWinner = function(winnerBid, Teams, Designers, sortedMergedPrioritylis
             name: winnerBid.designerName
         }, function(err, designer) {
 
-            designer.money -= winnerBid.designerBidValue + winnerBid.teamBidValue;
-            designer.save(function(err) {});
-
             team.designer = winnerBid.designerName;
-            team.money += designer.money;
+            team.money += designer.money - winnerBid.designerBidValue - winnerBid.teamBidValue;
             team.save(function(err) {});
+
+            designer.money = 0;
+            designer.save(function(err) {});
         });
     });
 

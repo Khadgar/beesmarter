@@ -27,13 +27,11 @@ DesignerPriorityList.find({}).select({
   list: 1,
   _id:0
 }).exec(function(err, designerPrioritylists) {
-  console.log(designerPrioritylists);
   TeamPriorityList.find({}).select({
     teamName: 1,
     list: 1,
     _id:0
   }).exec(function(err, teamPrioritylists) {
-    console.log(teamPrioritylists);
     priorityList.handlePriorityListRoundFinished(Teams, Designers, designerPrioritylists, teamPrioritylists);
   });
 });

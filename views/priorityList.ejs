@@ -9,24 +9,42 @@
     return (event.charCode >= 48 && event.charCode <= 57) || event.charCode === 0;
   }
 
-  function validateForm() {
+  function validateForm(max) {
     var priorityListForm = document.forms.priorityListForm;
 
+    console.log(priorityListForm[0].value);
+    var sum = parseInt(priorityListForm[0].value, 10);
+
     var uniqueValues = true;
-    for (var j = 0; j < priorityListForm.length - 1; j++) {
+    var tenModValues = true;
+    if(priorityListForm[0].value % 10 !== 0) {
+      tenModValues = false;
+    }
+    for (var j = 0; j < priorityListForm.length - 2; j++) {
         //Check for duplicates
         if (priorityListForm[j + 1].value === priorityListForm[j].value) {
           uniqueValues = false;
         }
-      }
-      if(uniqueValues) {
-        $('#submitbtn').attr('disabled',true);
-      }
-      else {
-        alert("The values have to be unique");
-        return false;
-      }
+        if(priorityListForm[j + 1].value % 10 !== 0) {
+          tenModValues = false;
+        }
+        sum = sum + parseInt(priorityListForm[j + 1].value, 10);
     }
+    if(!uniqueValues) {
+      alert("The values have to be unique");
+      return false;
+    }
+      
+    if(!tenModValues) {
+      alert("The values have to be dividable by 10");
+      return false;
+    }
+    if(sum !== max) {
+      alert("The sum of the values has to be " + max);
+      return false;
+    }
+    $('#submitbtn').attr('disabled',true);
+  }
   </script>
 
   <body class= "allbgcolor">
@@ -51,11 +69,11 @@
       <div id="prioritylist"></div>
       <% if (teams) { %>
         <div class="prio">
-      <form name="priorityListForm" onsubmit="return validateForm()" role="form" action="/priorityList" method="post">
+      <form name="priorityListForm" onsubmit="return validateForm(900)" role="form" action="/priorityList" method="post">
         
         <% teams.forEach(function(team){ var quoteName='"'+team.TeamFullName+'"';%>
         <div class="form-group">
-          <label><%= team.TeamFullName %> <input type="number" min="5" max="500" step="5" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
+          <label><%= team.TeamFullName %> <input type="number" min="10" step="10" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
         </div>
         
         <% }); %>
@@ -66,11 +84,11 @@
 
       <% if (designers) { %>
         <div class="prio">
-      <form name="priorityListForm" onsubmit="return validateForm()" role="form" action="/priorityList" method="post">
+      <form name="priorityListForm" onsubmit="return validateForm(600)" role="form" action="/priorityList" method="post">
         
         <% designers.forEach(function(designer){ var quoteName='"'+designer.name+'"';%>
         <div class="form-group">
-          <label><%= designer.name %> <input type="number" min="5" max="500" step="5" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
+          <label><%= designer.name %> <input type="number" min="10" step="10" onkeypress="return validateNumberInput(event)" class="form-control" name=<%- quoteName %> required></label>
         </div>
         
         <% }); %>

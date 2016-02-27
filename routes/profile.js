@@ -77,7 +77,7 @@ var Profile = function(app, io, Teams, DesignerPriorityList, TeamPriorityList, D
 
 var sortTeams = function(teams) {
     summedTeams = teams.map(function(team) {
-        var sum = team.teamVote + team.appVote;
+        var sum = Math.round(team.teamVote * 5 + team.appVote * 5);
         team.sum = sum;
         return team;
     });
@@ -88,7 +88,7 @@ var sortTeams = function(teams) {
 
 var sortDesigners = function(designers) {
     summedDesigners = designers.map(function(designer) {
-        var sum = designer.designerVote + designer.appVote;
+        var sum = Math.round(designer.designerVote * 5 + designer.appVote *5);
         designer.sum = sum;
         return designer;
     });

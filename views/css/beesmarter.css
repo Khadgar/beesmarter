@@ -121,7 +121,10 @@ html, body {
 
 .container .text-muted {
   text-align:center;
-  margin: 20px 0;
+}
+
+.wide{
+    margin-left: 0%;
 }
 
 .span4{

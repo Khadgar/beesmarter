@@ -28,38 +28,44 @@ var SensorBid = function(app, io, Teams, SensorBID, Users) {
 
     io.on('connection', function(socket) {
         socket.on('BIDSensorcheck', function(data) {
-            var username = data.username;
+            var username = "" + data.username;
+            console.log(socket.handshake.address);
 
             Teams.findOne({
                 TeamFullName: username
             }, function(error, team) {
-                var value = getCurrentValue();
-                var minValue = getMinValue();
-                var money = team.money;
-                var sensor = getBidSubject();
+                if(team) {
+                    var value = getCurrentValue();
+                    var minValue = getMinValue();
+                    var money = team.money;
+                    var sensor = getBidSubject();
 
-                var check = checkBid(value, minValue, money);
+                    var check = checkBid(value, minValue, money);
 
-                if (check.returnValue) {
-                    endAuction();
-                    var newsensorbid = {
-                        name: sensor,
-                        osszeg: value,
-                        felado: username,
-                        datum: getCurrentDateTime()
-                    };
-                    var sensorbid = new SensorBID(newsensorbid);
-                    sensorbid.save();
+                    if (check.returnValue) {
+                        endAuction();
+                        var newsensorbid = {
+                            name: sensor,
+                            osszeg: value,
+                            felado: username,
+                            datum: getCurrentDateTime()
+                        };
+                        var sensorbid = new SensorBID(newsensorbid);
+                        sensorbid.save();
 
-                    team.money -= value;
-                    team.save();
+                        team.money -= value;
+                        team.save();
 
-                    io.emit('BIDSensorsuccess', {
-                        msg: username + ' has won the bid for ' + sensor + ' for ' + value
-                    });
+                        io.emit('BIDSensorsuccess', {
+                            msg: username + ' has won the bid for ' + sensor + ' for ' + value
+                        });
+                    } else {
+                        socket.emit('BIDSensorfail', 'The bid was not recorded. ' + check.message);
+                    }
                 } else {
-                    socket.emit('BIDSensorfail', 'The bid was not recorded. ' + check.message);
+                    socket.emit('BIDSensorfail', 'The bid was not recorded. IP: ' + socket.handshake.address);
                 }
+
             });
         });
         socket.on('disconnect', function() {});
